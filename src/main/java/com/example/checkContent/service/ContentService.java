@@ -64,12 +64,11 @@ public class ContentService {
     }
 
     public boolean publishContent(Long id) {
-        Optional<Content> contents=contentRepository.findById(id);
+        Optional<Content> contents = contentRepository.findById(id);
         if (contents.isPresent()) {
-            Content content =contents.get();
-            if (content.getStatus().equals("APPROVED")) {
+            Content content = contents.get();
+            if ("APPROVED".equals(content.getStatus())) {
                 content.setPublished(true);
-                content.setStatus("PUBLISHED");
                 contentRepository.save(content);
                 return true;
             }
@@ -78,8 +77,7 @@ public class ContentService {
     }
 
     public boolean deleteContent(Long id) {
-        Optional<Content> contentOptional=contentRepository.findById(id);
-        if (contentOptional.isPresent()) {
+        if (contentRepository.existsById(id)) {
             contentRepository.deleteById(id);
             return true;
         }
@@ -87,11 +85,7 @@ public class ContentService {
     }
 
     public List<Content> getPublishedContent() {
-//        return contentRepository.findAllByPublishedTrue();
-
-        return contentRepository.findAll()
-                .stream().filter(Content::isPublished)
-                .collect(Collectors.toList());
+        return contentRepository.findAllByPublishedTrue();
     }
 
     public boolean updateContent(Long id, String newTit, String newBody) {

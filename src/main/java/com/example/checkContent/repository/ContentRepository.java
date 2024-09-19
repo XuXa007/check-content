@@ -1,6 +1,5 @@
 package com.example.checkContent.repository;
 
-import com.example.checkContent.dto.ContentDTO;
 import com.example.checkContent.model.Content;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
