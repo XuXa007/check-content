@@ -49,17 +49,4 @@ public class ResponseController {
         Response response = responseService.getResponseById(id).orElseThrow(() -> new RuntimeException("Response not found"));
         return ResponseEntity.ok(response);
     }
-
-    @PostMapping("/add")
-    public ResponseEntity<String> addResponse(@RequestParam Long userId, @RequestParam Long contentId, @RequestBody Response response) {
-        User user = userService.getUserById(userId).orElseThrow(() -> new RuntimeException("response not found"));
-        Content content = contentService.getContentById(contentId).orElseThrow(() -> new RuntimeException("content not found"));
-
-        response.setUser(user);
-        response.setContent(content);
-
-        responseService.saveResponse(response);
-
-        return ResponseEntity.ok("ok");
-    }
 }

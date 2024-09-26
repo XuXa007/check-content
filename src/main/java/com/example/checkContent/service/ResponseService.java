@@ -14,9 +14,6 @@ public class ResponseService {
     @Autowired
     private ResponseRepository responseRepository;
 
-    public List<Response> getResponsesByContent(Content content) {
-        return responseRepository.findByContent(content);
-    }
 
     public Optional<Response> getResponseById(Long id) {
         return responseRepository.findById(id);

@@ -1,5 +1,7 @@
 package com.example.checkContent.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -15,6 +17,7 @@ public class Response extends Base{
 
     @ManyToOne
     @JoinColumn(name = "content_id")
+    @JsonBackReference
     private Content content;
 
 

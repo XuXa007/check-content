@@ -19,6 +19,9 @@ public class ContentDTO extends RepresentationModel<ContentDTO> {
         this.published = published;
     }
 
+    public ContentDTO() {
+    }
+
     public Long getId() {
         return id;
     }

@@ -1,5 +1,6 @@
 package com.example.checkContent.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import org.springframework.hateoas.RepresentationModel;
 
@@ -18,6 +19,7 @@ public class Content extends Base {
     private User user;
 
     @OneToMany(mappedBy = "content", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<Response> responses;
 
     public Content(String title, String body) {

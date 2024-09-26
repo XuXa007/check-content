@@ -1,7 +1,10 @@
 package com.example.checkContent.assembler;
 
 import com.example.checkContent.controller.ContentController;
+import com.example.checkContent.controller.ResponseController;
+import com.example.checkContent.dto.ContentDTO;
 import com.example.checkContent.model.Content;
+import org.modelmapper.ModelMapper;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
@@ -9,11 +12,20 @@ import org.springframework.stereotype.Component;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 @Component
-public class ContentLinkBuilder implements RepresentationModelAssembler<Content, EntityModel<Content>> {
+public class ContentLinkBuilder implements RepresentationModelAssembler<Content, EntityModel<ContentDTO>> {
+    private final ModelMapper modelMapper;
+
+    public ContentLinkBuilder(ModelMapper modelMapper) {
+        this.modelMapper = modelMapper;
+    }
 
     @Override
-    public EntityModel<Content> toModel(Content content) {
-        EntityModel<Content> contentEntityModel = EntityModel.of(content);
+    public EntityModel<ContentDTO> toModel(Content content) {
+        ContentDTO contentDTO = modelMapper.map(content, ContentDTO.class);
+
+        EntityModel<ContentDTO> contentEntityModel = EntityModel.of(contentDTO);
+
+
         contentEntityModel.add(linkTo(methodOn(ContentController.class).getContentById(content.getId())).withSelfRel());
         switch (content.getStatus()) {
             case "WAITING":
@@ -25,6 +37,7 @@ public class ContentLinkBuilder implements RepresentationModelAssembler<Content,
                 contentEntityModel.add(linkTo(methodOn(ContentController.class).deleteContent(content.getId()))
                         .withRel("delete"));
                 break;
+
             case "APPROVED":
                 contentEntityModel.add(linkTo(methodOn(ContentController.class).publishContent(content.getId()))
                         .withRel("publish").withDeprecation("отправить на публикацию"));
@@ -33,6 +46,7 @@ public class ContentLinkBuilder implements RepresentationModelAssembler<Content,
                 contentEntityModel.add(linkTo(methodOn(ContentController.class).deleteContent(content.getId()))
                         .withRel("delete"));
                 break;
+
             case "REJECTED":
                 contentEntityModel.add(linkTo(methodOn(ContentController.class).approveContent(content.getId()))
                         .withRel("re approve"));
@@ -40,6 +54,8 @@ public class ContentLinkBuilder implements RepresentationModelAssembler<Content,
                         .withRel("update"));
                 contentEntityModel.add(linkTo(methodOn(ContentController.class).deleteContent(content.getId()))
                         .withRel("delete"));
+                contentEntityModel.add(linkTo(methodOn(ResponseController.class).getResponseById(content.getId()))
+                        .withRel("посмотреть ответ"));
                 break;
 
             case "PUBLISHED":
@@ -52,5 +68,3 @@ public class ContentLinkBuilder implements RepresentationModelAssembler<Content,
         return contentEntityModel;
     }
 }
-
-

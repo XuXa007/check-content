@@ -7,6 +7,17 @@ public class ResponseDTO {
     private Long userId;
     private Long contentId;
 
+    public ResponseDTO() {
+    }
+
+    public ResponseDTO(Long id, String message, String status, Long userId, Long contentId) {
+        this.id = id;
+        this.message = message;
+        this.status = status;
+        this.userId = userId;
+        this.contentId = contentId;
+    }
+
     public Long getId() {
         return id;
     }

@@ -1,10 +1,11 @@
 package com.example.checkContent.controller;
 
+import com.example.checkContent.dto.ContentDTO;
 import com.example.checkContent.model.Content;
 import com.example.checkContent.assembler.ContentLinkBuilder;
-import com.example.checkContent.model.Response;
 import com.example.checkContent.service.ContentService;
 import com.example.checkContent.service.ResponseService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -12,70 +13,58 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/content")
 public class ContentController {
-    @Autowired
-    private ContentService contentService;
+    private final ContentService contentService;
+    private final ResponseService responseService;
+    private final ContentLinkBuilder assembler;
+    private final ModelMapper modelMapper;
 
     @Autowired
-    private ResponseService responseService;
+    public ContentController(ContentService contentService, ResponseService responseService, ContentLinkBuilder assembler, ModelMapper modelMapper) {
+        this.contentService = contentService;
+        this.responseService = responseService;
+        this.assembler = assembler;
+        this.modelMapper = modelMapper;
+    }
 
-    @Autowired
-    private ContentLinkBuilder assembler;
 
     @PostMapping
-    public ResponseEntity<String> addContent(@RequestBody Content content) {
-        Content newContent = contentService.addContent(content.getTitle(), content.getBody());
-        return ResponseEntity.ok("add");
+    public void addContent(@RequestBody ContentDTO contentDTO) {
+        Content content = modelMapper.map(contentDTO, Content.class);
+        contentService.addContent(content);
     }
 
     @GetMapping
-    public CollectionModel<EntityModel<Content>> getAllContent() {
+    public CollectionModel<EntityModel<ContentDTO>> getAllContent() {
         List<Content> contents = contentService.getAllContent();
-        List<EntityModel<Content>> contentModels = contents
-                .stream()
+        List<EntityModel<ContentDTO>> contentDTOs = contents.stream()
                 .map(assembler::toModel)
                 .toList();
-
-        return CollectionModel.of(contentModels);
+        return CollectionModel.of(contentDTOs);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<EntityModel<Content>> getContentById(@PathVariable Long id) {
-        Content content=contentService.getContentById(id).orElseThrow(RuntimeException::new);
-
-        if ("REJECTED".equals(content.getStatus())) {
-            List<Response> responses = responseService.getResponsesByContent(content);
-
-            if (!responses.isEmpty()) {
-                EntityModel<Content> contentModel = assembler.toModel(content);
-                // Добавляем ссылку на отклик
-                contentModel.add(linkTo(methodOn(ResponseController.class).getResponseById(responses.get(0).getId())).withRel("response"));
-
-                return ResponseEntity.ok(contentModel);
-            }
-        }
-
-        EntityModel<Content> contentModel = assembler.toModel(content);
-        return ResponseEntity.ok(contentModel);
+    public EntityModel<ContentDTO> getContentById(@PathVariable Long id) {
+        Content content = contentService.getContentById(id).orElseThrow(RuntimeException::new);
+        return assembler.toModel(content);
     }
 
     @PatchMapping("/approve/{id}")
     public ResponseEntity<String> approveContent(@PathVariable Long id) {
-        String res= contentService.approveContent(id);
-
-        if (res.startsWith("approved")) {
-            return ResponseEntity.ok("Success: Content approved");
-        } else if (res.startsWith("rejected")) {
-            return ResponseEntity.badRequest().body(res);
-        } else {
-            return ResponseEntity.notFound().build();
+        contentService.approveContent(id);
+        Optional<Content> content=contentService.getContentById(id);
+        if (Optional.ofNullable(content.get().getStatus()).equals("APPROVED")){
+            return ResponseEntity.ok().body("yes");
+        } else if (Optional.ofNullable(content.get().getStatus()).equals("REJECTED")) {
+            return ResponseEntity.ok().body("no");
         }
+        return ResponseEntity.notFound().build();
     }
 
     @PatchMapping("/published/{id}")
@@ -109,14 +98,12 @@ public class ContentController {
         }
     }
 
-    @GetMapping("/published")
-    public CollectionModel<EntityModel<Content>> getPublishedContent() {
-        List<Content> contents = contentService.getPublishedContent();
-        List<EntityModel<Content>> contentModels = contents
-                .stream()
-                .map(assembler::toModel)
-                .toList();
-        return CollectionModel.of(contentModels);
-    }
-
+//    @GetMapping("/published")
+//    public CollectionModel<EntityModel<ContentDTO>> getPublishedContent() {
+//        List<ContentDTO> contents = contentService.getPublishedContent();
+//        List<EntityModel<ContentDTO>> contentDTOs = contents.stream()
+//                .map(assembler::toModel)
+//                .toList();
+//        return CollectionModel.of(contentDTOs);
+//    }
 }
