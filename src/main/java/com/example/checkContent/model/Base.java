@@ -1,9 +1,20 @@
 package com.example.checkContent.model;
 
-public class Base {
-    private String Id;
+import jakarta.persistence.*;
+import org.hibernate.annotations.GenericGenerator;
 
-    public void setId(String id) {
-        Id = id;
+@MappedSuperclass
+public abstract class Base {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", updatable = false, nullable = false)
+    private Long id;
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getId() {
+        return id;
     }
 }

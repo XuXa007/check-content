@@ -1,7 +1,6 @@
 package com.example.checkContent.assembler;
 
 import com.example.checkContent.controller.ContentController;
-import com.example.checkContent.dto.ContentDTO;
 import com.example.checkContent.model.Content;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
@@ -18,28 +17,40 @@ public class ContentLinkBuilder implements RepresentationModelAssembler<Content,
         contentEntityModel.add(linkTo(methodOn(ContentController.class).getContentById(content.getId())).withSelfRel());
         switch (content.getStatus()) {
             case "WAITING":
-                contentEntityModel.add(linkTo(methodOn(ContentController.class).approveContent(content.getId())).withRel("approve"));
-                contentEntityModel.add(linkTo(methodOn(ContentController.class).updateContent(content.getId(), null)).withRel("update"));
-                contentEntityModel.add(linkTo(methodOn(ContentController.class).deleteContent(content.getId())).withRel("delete"));
+                contentEntityModel.add(linkTo(methodOn(ContentController.class).approveContent(content.getId()))
+                        .withRel("approve")
+                        .withDeprecation("отправить контент на проверку"));
+                contentEntityModel.add(linkTo(methodOn(ContentController.class).updateContent(content.getId(), null))
+                        .withRel("update"));
+                contentEntityModel.add(linkTo(methodOn(ContentController.class).deleteContent(content.getId()))
+                        .withRel("delete"));
                 break;
             case "APPROVED":
-                contentEntityModel.add(linkTo(methodOn(ContentController.class).publishContent(content.getId())).withRel("publish"));
-                contentEntityModel.add(linkTo(methodOn(ContentController.class).updateContent(content.getId(), null)).withRel("update"));
-                contentEntityModel.add(linkTo(methodOn(ContentController.class).deleteContent(content.getId())).withRel("delete"));
+                contentEntityModel.add(linkTo(methodOn(ContentController.class).publishContent(content.getId()))
+                        .withRel("publish").withDeprecation("отправить на публикацию"));
+                contentEntityModel.add(linkTo(methodOn(ContentController.class).updateContent(content.getId(), null))
+                        .withRel("update"));
+                contentEntityModel.add(linkTo(methodOn(ContentController.class).deleteContent(content.getId()))
+                        .withRel("delete"));
                 break;
             case "REJECTED":
-                contentEntityModel.add(linkTo(methodOn(ContentController.class).approveContent(content.getId())).withRel("re approve"));
-                contentEntityModel.add(linkTo(methodOn(ContentController.class).updateContent(content.getId(), null)).withRel("update"));
-
-                contentEntityModel.add(linkTo(methodOn(ContentController.class).deleteContent(content.getId())).withRel("delete"));
+                contentEntityModel.add(linkTo(methodOn(ContentController.class).approveContent(content.getId()))
+                        .withRel("re approve"));
+                contentEntityModel.add(linkTo(methodOn(ContentController.class).updateContent(content.getId(), null))
+                        .withRel("update"));
+                contentEntityModel.add(linkTo(methodOn(ContentController.class).deleteContent(content.getId()))
+                        .withRel("delete"));
                 break;
 
             case "PUBLISHED":
-                contentEntityModel.add(linkTo(methodOn(ContentController.class).updateContent(content.getId(), null)).withRel("update"));
-                contentEntityModel.add(linkTo(methodOn(ContentController.class).deleteContent(content.getId())).withRel("delete"));
+                contentEntityModel.add(linkTo(methodOn(ContentController.class).updateContent(content.getId(), null))
+                        .withRel("update"));
+                contentEntityModel.add(linkTo(methodOn(ContentController.class).deleteContent(content.getId()))
+                        .withRel("delete"));
                 break;
         }
         return contentEntityModel;
     }
-
 }
+
+

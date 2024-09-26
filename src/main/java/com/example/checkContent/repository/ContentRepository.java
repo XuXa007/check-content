@@ -10,3 +10,5 @@ import java.util.List;
 public interface ContentRepository extends JpaRepository<Content, Long> {
     List<Content> findAllByPublishedTrue();
 }
+
+

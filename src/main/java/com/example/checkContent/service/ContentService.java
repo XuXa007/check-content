@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class ContentService {
@@ -27,10 +26,6 @@ public class ContentService {
         contentRepository.save(content);
         return contentRepository.save(content);
     }
-
-//    public CollectionModel<EntityModel<Content>> getAllContent() {
-//        return contentRepository.findAll();
-//    }
 
     public List<Content> getAllContent() {
         return contentRepository.findAll();
@@ -69,6 +64,7 @@ public class ContentService {
             Content content = contents.get();
             if ("APPROVED".equals(content.getStatus())) {
                 content.setPublished(true);
+                content.setStatus("PUBLISHED");
                 contentRepository.save(content);
                 return true;
             }
