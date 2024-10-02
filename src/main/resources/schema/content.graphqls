@@ -1,0 +1,18 @@
+#type Query {
+#    contents(titleFilter: String): [Content]
+#}
+#
+#type Content {
+#    id: ID!
+#    title: String!
+#    body: String!
+#}
+#
+#type Mutation {
+#    addContent(content: SubmittedContent): Content
+#}
+#
+#input SubmittedContent {
+#    title: String!
+#    body: String!
+#}

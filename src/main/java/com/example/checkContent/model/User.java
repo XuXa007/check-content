@@ -13,8 +13,8 @@ public class User extends Base {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Content> contents;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Response> responses;
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+//    private List<Response> responses;
 
 
     public String getUsername() {
@@ -41,11 +41,11 @@ public class User extends Base {
         this.contents = contents;
     }
 
-    public List<Response> getResponses() {
-        return responses;
-    }
-
-    public void setResponses(List<Response> responses) {
-        this.responses = responses;
-    }
+//    public List<Response> getResponses() {
+//        return responses;
+//    }
+//
+//    public void setResponses(List<Response> responses) {
+//        this.responses = responses;
+//    }
 }

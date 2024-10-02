@@ -1,0 +1,18 @@
+type Query {
+    contents(titleFilter: String): [Content]
+}
+
+type Content {
+    id: ID!
+    title: String!
+    body: String!
+}
+
+type Mutation {
+    addContent(contentDTO: AddContentDTO): Content
+}
+
+input AddContentDTO {
+    title: String!
+    body: String!
+}
