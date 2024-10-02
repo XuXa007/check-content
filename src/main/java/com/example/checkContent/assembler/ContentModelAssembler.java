@@ -12,10 +12,10 @@ import org.springframework.stereotype.Component;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 @Component
-public class ContentLinkBuilder implements RepresentationModelAssembler<Content, EntityModel<ContentDTO>> {
+public class ContentModelAssembler implements RepresentationModelAssembler<Content, EntityModel<ContentDTO>> {
     private final ModelMapper modelMapper;
 
-    public ContentLinkBuilder(ModelMapper modelMapper) {
+    public ContentModelAssembler(ModelMapper modelMapper) {
         this.modelMapper = modelMapper;
     }
 
@@ -25,26 +25,32 @@ public class ContentLinkBuilder implements RepresentationModelAssembler<Content,
 
         EntityModel<ContentDTO> contentEntityModel = EntityModel.of(contentDTO);
 
-
         contentEntityModel.add(linkTo(methodOn(ContentController.class).getContentById(content.getId())).withSelfRel());
         switch (content.getStatus()) {
             case "WAITING":
                 contentEntityModel.add(linkTo(methodOn(ContentController.class).approveContent(content.getId()))
                         .withRel("approve")
+                        .withType("PATCH")
                         .withDeprecation("отправить контент на проверку"));
                 contentEntityModel.add(linkTo(methodOn(ContentController.class).updateContent(content.getId(), null))
-                        .withRel("update"));
+                        .withRel("update")
+                        .withType("PATCH"));
                 contentEntityModel.add(linkTo(methodOn(ContentController.class).deleteContent(content.getId()))
-                        .withRel("delete"));
+                        .withRel("delete")
+                        .withType("DELETE"));
                 break;
 
             case "APPROVED":
                 contentEntityModel.add(linkTo(methodOn(ContentController.class).publishContent(content.getId()))
-                        .withRel("publish").withDeprecation("отправить на публикацию"));
+                        .withRel("publish")
+                        .withType("PATCH")
+                        .withDeprecation("отправить на публикацию"));
                 contentEntityModel.add(linkTo(methodOn(ContentController.class).updateContent(content.getId(), null))
-                        .withRel("update"));
+                        .withRel("update")
+                        .withType("PATCH"));
                 contentEntityModel.add(linkTo(methodOn(ContentController.class).deleteContent(content.getId()))
-                        .withRel("delete"));
+                        .withRel("delete")
+                        .withType("DELETE"));
                 break;
 
             case "REJECTED":
@@ -55,7 +61,8 @@ public class ContentLinkBuilder implements RepresentationModelAssembler<Content,
                 contentEntityModel.add(linkTo(methodOn(ContentController.class).deleteContent(content.getId()))
                         .withRel("delete"));
                 contentEntityModel.add(linkTo(methodOn(ResponseController.class).getResponseById(content.getId()))
-                        .withRel("посмотреть ответ"));
+                        .withRel("посмотреть ответ")
+                        .withType("GET"));
                 break;
 
             case "PUBLISHED":
