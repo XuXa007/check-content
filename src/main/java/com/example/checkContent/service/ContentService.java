@@ -1,5 +1,6 @@
 package com.example.checkContent.service;
 
+import com.example.checkContent.assembler.ContentModelAssembler;
 import com.example.checkContent.dto.ContentDTO;
 import com.example.checkContent.model.Content;
 import com.example.checkContent.model.Response;
@@ -7,6 +8,7 @@ import com.example.checkContent.repository.ContentRepository;
 import com.example.checkContent.repository.ResponseRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,26 +23,31 @@ public class ContentService {
 
     private final ContentRepository contentRepository;
     private final ResponseRepository responseRepository;
+    private final ContentModelAssembler assembler;
 
     private final ModelMapper modelMapper;
 
     @Autowired
-    public ContentService(ContentRepository contentRepository, ResponseRepository responseRepository, ModelMapper modelMapper) {
+    public ContentService(ContentRepository contentRepository, ResponseRepository responseRepository, ContentModelAssembler assembler, ModelMapper modelMapper) {
         this.contentRepository = contentRepository;
         this.responseRepository = responseRepository;
+        this.assembler = assembler;
         this.modelMapper = modelMapper;
     }
 
-    public void addContent(Content contentDTO) {
+    public void addContent(ContentDTO contentDTO) {
         contentDTO.setStatus("WAITING");
         contentDTO.setPublished(false);
         Content content = modelMapper.map(contentDTO, Content.class);
         contentRepository.saveAndFlush(content);
     }
 
-    public List<Content> getAllContent() {
-        return contentRepository.findAll();
+    public List<EntityModel<ContentDTO>> getAllContent() {
+        return contentRepository.findAll().stream()
+                .map(assembler::toModel)
+                .collect(Collectors.toList());
     }
+
 
     public Optional<Content> getContentById(Long id) {
         return contentRepository.findById(id);
@@ -118,5 +125,11 @@ public class ContentService {
             return true;
         }
         return false;
+    }
+
+    public List<ContentDTO> getAllContentDTO() {
+        return contentRepository.findAll().stream()
+                .map(content -> modelMapper.map(content, ContentDTO.class))
+                .collect(Collectors.toList());
     }
 }

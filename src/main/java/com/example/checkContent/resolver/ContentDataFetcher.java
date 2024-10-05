@@ -2,14 +2,13 @@ package com.example.checkContent.resolver;
 
 import com.example.checkContent.dto.AddContentDTO;
 import com.example.checkContent.dto.ContentDTO;
-import com.example.checkContent.model.Content;
 import com.example.checkContent.service.ContentService;
 import com.netflix.graphql.dgs.DgsComponent;
 import com.netflix.graphql.dgs.DgsMutation;
 import com.netflix.graphql.dgs.DgsQuery;
 import com.netflix.graphql.dgs.InputArgument;
+import org.springframework.hateoas.EntityModel;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,20 +21,20 @@ public class ContentDataFetcher {
     }
 
     @DgsQuery
-    public List<Content> contents(@InputArgument String titleFilter) {
-        List<Content> allContents = contentService.getAllContent();
+    public List<ContentDTO> contents(@InputArgument String titleFilter) {
+        List<ContentDTO> allContents = contentService.getAllContentDTO(); // Возвращаем список DTO напрямую
 
-        if(titleFilter == null) {
+        if (titleFilter == null) {
             return allContents;
         }
         return allContents.stream()
-                .filter(content -> content.getTitle().contains(titleFilter))
+                .filter(c -> c.getTitle().contains(titleFilter)) // Проверяем title напрямую
                 .collect(Collectors.toList());
     }
 
     @DgsMutation
-    public Content addContent(@InputArgument AddContentDTO contentDTO) {
-        Content content = new Content();
+    public ContentDTO addContent(@InputArgument AddContentDTO contentDTO) {
+        ContentDTO content = new ContentDTO();
         content.setTitle(contentDTO.getTitle());
         content.setBody(contentDTO.getBody());
         content.setStatus("WAITING");

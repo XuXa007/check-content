@@ -7,7 +7,6 @@ import com.example.checkContent.service.ContentService;
 import com.example.checkContent.service.ResponseService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,18 +33,14 @@ public class ContentController {
 
     @PostMapping
     public void addContent(@RequestBody ContentDTO contentDTO) {
-        Content content = modelMapper.map(contentDTO, Content.class);
-        contentService.addContent(content);
+        contentService.addContent(contentDTO);
     }
 
     @GetMapping
-    public ResponseEntity<CollectionModel<EntityModel<ContentDTO>>> getAllContent() {
-        List<Content> contents = contentService.getAllContent();
-        List<EntityModel<ContentDTO>> contentDTOs = contents.stream()
-                .map(assembler::toModel)
-                .toList();
-        return ResponseEntity.ok(CollectionModel.of(contentDTOs));
+    public List<EntityModel<ContentDTO>> getAllContent() {
+        return contentService.getAllContent();
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<EntityModel<ContentDTO>> getContentById(@PathVariable Long id) {
