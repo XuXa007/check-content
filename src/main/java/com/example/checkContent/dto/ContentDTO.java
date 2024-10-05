@@ -1,6 +1,9 @@
 package com.example.checkContent.dto;
 
+import com.example.checkContent.Enums.CategoryEnum;
 import com.example.checkContent.model.Content;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.RepresentationModel;
 
@@ -10,6 +13,8 @@ public class ContentDTO extends RepresentationModel<ContentDTO> {
     private String body;
     private String status;
     private boolean published;
+    @Enumerated(EnumType.STRING)
+    private CategoryEnum categoryEnum;
 
     public ContentDTO(Long id, String title, String body, String status, boolean published) {
         this.id = id;
@@ -60,5 +65,13 @@ public class ContentDTO extends RepresentationModel<ContentDTO> {
 
     public void setPublished(boolean published) {
         this.published = published;
+    }
+
+    public CategoryEnum getCategoryEnum() {
+        return categoryEnum;
+    }
+
+    public void setCategoryEnum(CategoryEnum categoryEnum) {
+        this.categoryEnum = categoryEnum;
     }
 }

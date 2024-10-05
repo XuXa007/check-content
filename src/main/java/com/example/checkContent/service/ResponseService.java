@@ -14,7 +14,6 @@ public class ResponseService {
     @Autowired
     private ResponseRepository responseRepository;
 
-
     public Optional<Response> getResponseById(Long id) {
         return responseRepository.findById(id);
     }

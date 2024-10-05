@@ -1,5 +1,6 @@
 package com.example.checkContent.model;
 
+import com.example.checkContent.Enums.CategoryEnum;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import org.springframework.hateoas.RepresentationModel;
@@ -13,6 +14,8 @@ public class Content extends Base {
     private String body;
     private String status;
     private boolean published;
+    @Enumerated(EnumType.STRING)
+    private CategoryEnum categoryEnum;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -30,6 +33,14 @@ public class Content extends Base {
     }
 
     public Content() {}
+
+    public CategoryEnum getCategoryEnum() {
+        return categoryEnum;
+    }
+
+    public void setCategoryEnum(CategoryEnum categoryEnum) {
+        this.categoryEnum = categoryEnum;
+    }
 
     public String getTitle() {
         return title;

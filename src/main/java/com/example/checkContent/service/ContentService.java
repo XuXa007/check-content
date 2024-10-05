@@ -8,6 +8,7 @@ import com.example.checkContent.repository.ContentRepository;
 import com.example.checkContent.repository.ResponseRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +18,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class ContentService {
-
     private static final int MIN_TITLE_LENGTH = 10;
     private static final int MIN_BODY_LENGTH = 50;
 
@@ -43,6 +43,11 @@ public class ContentService {
     }
 
     public List<EntityModel<ContentDTO>> getAllContent() {
+//        List<EntityModel<ContentDTO>> contents = contentRepository.findAll().stream()
+//                .map(assembler::toModel)
+//                .collect(Collectors.toList());
+//        return (CollectionModel.of(contents));
+
         return contentRepository.findAll().stream()
                 .map(assembler::toModel)
                 .collect(Collectors.toList());
@@ -131,5 +136,9 @@ public class ContentService {
         return contentRepository.findAll().stream()
                 .map(content -> modelMapper.map(content, ContentDTO.class))
                 .collect(Collectors.toList());
+    }
+
+    public Optional<ContentDTO> getContentByIdDTO(Long id) {
+        return contentRepository.findById(id).map(content -> modelMapper.map(content, ContentDTO.class));
     }
 }

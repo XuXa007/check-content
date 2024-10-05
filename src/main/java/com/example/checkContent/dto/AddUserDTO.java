@@ -1,32 +1,19 @@
 package com.example.checkContent.dto;
 
 import com.example.checkContent.Enums.RoleEnum;
-import com.example.checkContent.model.Base;
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.RepresentationModel;
 
-public class UserDTO extends RepresentationModel<UserDTO> {
-    private Long id;
+public class AddUserDTO {
     private String username;
     private String email;
     private RoleEnum role;
 
-    public UserDTO(Long id, String username, String email, RoleEnum role) {
-        this.id = id;
+    public AddUserDTO() {
+    }
+
+    public AddUserDTO(String username, String email, RoleEnum role) {
         this.username = username;
         this.email = email;
         this.role = role;
-    }
-
-    public UserDTO() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getUsername() {
@@ -52,6 +39,4 @@ public class UserDTO extends RepresentationModel<UserDTO> {
     public void setRole(RoleEnum role) {
         this.role = role;
     }
-
-
 }

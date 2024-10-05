@@ -1,5 +1,6 @@
 package com.example.checkContent.model;
 
+import com.example.checkContent.Enums.RoleEnum;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.List;
 public class User extends Base {
     private String username;
     private String email;
+    private RoleEnum role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Content> contents;
@@ -41,7 +43,15 @@ public class User extends Base {
         this.contents = contents;
     }
 
-//    public List<Response> getResponses() {
+    public RoleEnum getRole() {
+        return role;
+    }
+
+    public void setRole(RoleEnum role) {
+        this.role = role;
+    }
+
+    //    public List<Response> getResponses() {
 //        return responses;
 //    }
 //

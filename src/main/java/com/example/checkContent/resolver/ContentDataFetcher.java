@@ -7,9 +7,9 @@ import com.netflix.graphql.dgs.DgsComponent;
 import com.netflix.graphql.dgs.DgsMutation;
 import com.netflix.graphql.dgs.DgsQuery;
 import com.netflix.graphql.dgs.InputArgument;
-import org.springframework.hateoas.EntityModel;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @DgsComponent
@@ -22,14 +22,21 @@ public class ContentDataFetcher {
 
     @DgsQuery
     public List<ContentDTO> contents(@InputArgument String titleFilter) {
-        List<ContentDTO> allContents = contentService.getAllContentDTO(); // Возвращаем список DTO напрямую
+        List<ContentDTO> allContents = contentService.getAllContentDTO();
 
         if (titleFilter == null) {
             return allContents;
         }
         return allContents.stream()
-                .filter(c -> c.getTitle().contains(titleFilter)) // Проверяем title напрямую
+                .filter(c -> c.getTitle().contains(titleFilter))
                 .collect(Collectors.toList());
+    }
+
+
+
+    @DgsQuery
+    public Optional<ContentDTO> getContentsByID(@InputArgument Long id) {
+        return contentService.getContentByIdDTO(id);
     }
 
     @DgsMutation

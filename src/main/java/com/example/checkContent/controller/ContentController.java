@@ -1,5 +1,6 @@
 package com.example.checkContent.controller;
 
+import com.example.checkContent.Enums.CategoryEnum;
 import com.example.checkContent.dto.ContentDTO;
 import com.example.checkContent.model.Content;
 import com.example.checkContent.assembler.ContentModelAssembler;
@@ -7,10 +8,12 @@ import com.example.checkContent.service.ContentService;
 import com.example.checkContent.service.ResponseService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.swing.text.html.parser.ContentModel;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,6 +36,7 @@ public class ContentController {
 
     @PostMapping
     public void addContent(@RequestBody ContentDTO contentDTO) {
+        contentDTO.setCategoryEnum(CategoryEnum.valueOf("Новости"));
         contentService.addContent(contentDTO);
     }
 

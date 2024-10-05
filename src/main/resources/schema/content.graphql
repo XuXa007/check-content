@@ -1,11 +1,12 @@
-type Query {
-    contents(titleFilter: String): [Content]
-}
-
 type Content {
     id: ID!
     title: String!
     body: String!
+}
+
+type Query {
+    contents(titleFilter: String): [Content]
+    getContentsByID(id: Int!): Content
 }
 
 type Mutation {

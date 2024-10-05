@@ -1,8 +1,11 @@
 package com.example.checkContent.dto;
 
+
 public class AddContentDTO {
     public String title;
     public String body;
+//    @Enumerated(EnumType.STRING)
+//    private CategoryEnum categoryEnum;
 
     public String getTitle() {
         return title;
@@ -19,4 +22,12 @@ public class AddContentDTO {
     public void setBody(String body) {
         this.body = body;
     }
+
+//    public CategoryEnum getCategoryEnum() {
+//        return categoryEnum;
+//    }
+//
+//    public void setCategoryEnum(CategoryEnum categoryEnum) {
+//        this.categoryEnum = categoryEnum;
+//    }
 }

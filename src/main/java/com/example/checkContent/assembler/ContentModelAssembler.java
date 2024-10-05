@@ -4,6 +4,7 @@ import com.example.checkContent.controller.ContentController;
 import com.example.checkContent.controller.ResponseController;
 import com.example.checkContent.dto.ContentDTO;
 import com.example.checkContent.model.Content;
+import org.jetbrains.annotations.NotNull;
 import org.modelmapper.ModelMapper;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
@@ -19,13 +20,24 @@ public class ContentModelAssembler implements RepresentationModelAssembler<Conte
         this.modelMapper = modelMapper;
     }
 
+//    @Override
+//    public @NotNull EntityModel<ContentDTO> toModel(@NotNull Content content) {
+//        ContentDTO contentDTO = modelMapper.map(content, ContentDTO.class);
+
+//        EntityModel<ContentDTO> contentEntityModel = EntityModel.of(contentDTO
+//                linkTo(methodOn(ContentController.class)
+//                        .getContentById(content.getId()))
+//                        .withSelfRel()
+//        );
+
     @Override
-    public EntityModel<ContentDTO> toModel(Content content) {
+    public @NotNull EntityModel<ContentDTO> toModel(@NotNull Content content) {
         ContentDTO contentDTO = modelMapper.map(content, ContentDTO.class);
 
-        EntityModel<ContentDTO> contentEntityModel = EntityModel.of(contentDTO);
+        EntityModel<ContentDTO> contentEntityModel = EntityModel.of(contentDTO,
+                linkTo(methodOn(ContentController.class).getContentById(content.getId())).withSelfRel()
+        );
 
-        contentEntityModel.add(linkTo(methodOn(ContentController.class).getContentById(content.getId())).withSelfRel());
         switch (content.getStatus()) {
             case "WAITING":
                 contentEntityModel.add(linkTo(methodOn(ContentController.class).approveContent(content.getId()))
@@ -72,6 +84,8 @@ public class ContentModelAssembler implements RepresentationModelAssembler<Conte
                         .withRel("delete"));
                 break;
         }
+
         return contentEntityModel;
     }
+
 }
