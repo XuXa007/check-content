@@ -10,13 +10,12 @@ import java.util.List;
 public class User extends Base {
     private String username;
     private String email;
+
+    @Enumerated(EnumType.STRING)
     private RoleEnum role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Content> contents;
-
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-//    private List<Response> responses;
 
 
     public String getUsername() {

@@ -1,6 +1,5 @@
 package com.example.checkContent.controller;
 
-import com.example.checkContent.Enums.CategoryEnum;
 import com.example.checkContent.dto.ContentDTO;
 import com.example.checkContent.model.Content;
 import com.example.checkContent.assembler.ContentModelAssembler;
@@ -13,9 +12,8 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.text.html.parser.ContentModel;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/content")
@@ -36,33 +34,39 @@ public class ContentController {
 
     @PostMapping
     public void addContent(@RequestBody ContentDTO contentDTO) {
-        contentDTO.setCategoryEnum(CategoryEnum.valueOf("Новости"));
         contentService.addContent(contentDTO);
     }
 
     @GetMapping
-    public List<EntityModel<ContentDTO>> getAllContent() {
-        return contentService.getAllContent();
+    public CollectionModel<EntityModel<ContentDTO>> getAllContent() {
+        List<ContentDTO> contentDTOs = contentService.getAllContent();
+
+        List<EntityModel<ContentDTO>> contentEntities = contentDTOs.stream()
+                .map(assembler::toModel)
+                .collect(Collectors.toList());
+
+        return CollectionModel.of(contentEntities);
     }
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<EntityModel<ContentDTO>> getContentById(@PathVariable Long id) {
-        Content content = contentService.getContentById(id).orElseThrow(RuntimeException::new);
-        return ResponseEntity.ok(assembler.toModel(content));
+    public EntityModel<ContentDTO> getContentById(@PathVariable Long id) {
+        ContentDTO content = contentService.getContentById(id);
+        return assembler.toModel(content);
     }
 
     @PatchMapping("/approve/{id}")
     public ResponseEntity<String> approveContent(@PathVariable Long id) {
         contentService.approveContent(id);
-        Optional<Content> content=contentService.getContentById(id);
-        if (Optional.ofNullable(content.get().getStatus()).equals("APPROVED")){
-            return ResponseEntity.ok().body("yes");
-        } else if (Optional.ofNullable(content.get().getStatus()).equals("REJECTED")) {
-            return ResponseEntity.ok().body("no");
+        ContentDTO content = contentService.getContentById(id);
+        if (content.getStatus().equals("APPROVED")) {
+            return ResponseEntity.ok("yes");
+        } else if (content.getStatus().equals("REJECTED")) {
+            return ResponseEntity.ok("no");
         }
         return ResponseEntity.notFound().build();
     }
+
 
     @PatchMapping("/published/{id}")
     public ResponseEntity<String> publishContent(@PathVariable Long id){

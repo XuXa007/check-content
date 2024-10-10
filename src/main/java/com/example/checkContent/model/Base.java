@@ -1,7 +1,6 @@
 package com.example.checkContent.model;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.GenericGenerator;
 
 @MappedSuperclass
 public abstract class Base {

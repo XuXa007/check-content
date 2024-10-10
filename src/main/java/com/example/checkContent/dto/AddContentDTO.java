@@ -4,8 +4,18 @@ package com.example.checkContent.dto;
 public class AddContentDTO {
     public String title;
     public String body;
+    private Long userId;
 //    @Enumerated(EnumType.STRING)
 //    private CategoryEnum categoryEnum;
+
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
 
     public String getTitle() {
         return title;

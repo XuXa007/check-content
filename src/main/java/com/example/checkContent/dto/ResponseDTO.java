@@ -1,26 +1,14 @@
 package com.example.checkContent.dto;
 
 public class ResponseDTO {
-    private Long id;
     private String message;
-//    private String status;
-//    private Long userId;
-//    private Long contentId;
+    private Long contentId;
+    private Long userId;
 
-    public ResponseDTO() {
-    }
-
-    public ResponseDTO(Long id, String message) {
-        this.id = id;
+    public ResponseDTO(String message, Long contentId, Long userId) {
         this.message = message;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
+        this.contentId = contentId;
+        this.userId = userId;
     }
 
     public String getMessage() {
@@ -31,4 +19,19 @@ public class ResponseDTO {
         this.message = message;
     }
 
+    public Long getContentId() {
+        return contentId;
+    }
+
+    public void setContentId(Long contentId) {
+        this.contentId = contentId;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
 }

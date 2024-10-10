@@ -3,11 +3,11 @@ package com.example.checkContent.model;
 import com.example.checkContent.Enums.CategoryEnum;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import org.springframework.hateoas.RepresentationModel;
 
 import java.util.List;
 
 @Entity
+@Table(name = "contents")
 public class Content extends Base {
     private String title;
     @Column(length = 1000)
@@ -17,7 +17,7 @@ public class Content extends Base {
     @Enumerated(EnumType.STRING)
     private CategoryEnum categoryEnum;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User user;
 

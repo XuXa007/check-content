@@ -1,8 +1,6 @@
 package com.example.checkContent.dto;
 
 import com.example.checkContent.Enums.RoleEnum;
-import com.example.checkContent.model.Base;
-import org.springframework.hateoas.Link;
 import org.springframework.hateoas.RepresentationModel;
 
 public class UserDTO extends RepresentationModel<UserDTO> {

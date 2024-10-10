@@ -3,7 +3,6 @@ package com.example.checkContent.assembler;
 import com.example.checkContent.controller.ContentController;
 import com.example.checkContent.controller.ResponseController;
 import com.example.checkContent.dto.ContentDTO;
-import com.example.checkContent.model.Content;
 import org.jetbrains.annotations.NotNull;
 import org.modelmapper.ModelMapper;
 import org.springframework.hateoas.EntityModel;
@@ -13,7 +12,7 @@ import org.springframework.stereotype.Component;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 @Component
-public class ContentModelAssembler implements RepresentationModelAssembler<Content, EntityModel<ContentDTO>> {
+public class ContentModelAssembler implements RepresentationModelAssembler<ContentDTO, EntityModel<ContentDTO>> {
     private final ModelMapper modelMapper;
 
     public ContentModelAssembler(ModelMapper modelMapper) {
@@ -31,12 +30,10 @@ public class ContentModelAssembler implements RepresentationModelAssembler<Conte
 //        );
 
     @Override
-    public @NotNull EntityModel<ContentDTO> toModel(@NotNull Content content) {
-        ContentDTO contentDTO = modelMapper.map(content, ContentDTO.class);
+    public @NotNull EntityModel<ContentDTO> toModel(@NotNull ContentDTO content) {
 
-        EntityModel<ContentDTO> contentEntityModel = EntityModel.of(contentDTO,
-                linkTo(methodOn(ContentController.class).getContentById(content.getId())).withSelfRel()
-        );
+        EntityModel<ContentDTO> contentEntityModel = EntityModel.of(content,
+                linkTo(methodOn(ContentController.class).getContentById(content.getId())).withSelfRel());
 
         switch (content.getStatus()) {
             case "WAITING":

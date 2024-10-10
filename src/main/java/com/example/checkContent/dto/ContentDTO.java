@@ -1,10 +1,6 @@
 package com.example.checkContent.dto;
 
 import com.example.checkContent.Enums.CategoryEnum;
-import com.example.checkContent.model.Content;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import org.springframework.hateoas.Link;
 import org.springframework.hateoas.RepresentationModel;
 
 public class ContentDTO extends RepresentationModel<ContentDTO> {
@@ -13,18 +9,33 @@ public class ContentDTO extends RepresentationModel<ContentDTO> {
     private String body;
     private String status;
     private boolean published;
-    @Enumerated(EnumType.STRING)
     private CategoryEnum categoryEnum;
+    private Long userId;
 
-    public ContentDTO(Long id, String title, String body, String status, boolean published) {
+    private UserDTO user;
+
+
+    public ContentDTO() {
+    }
+
+
+    public ContentDTO(Long id, String title, String body, String status, boolean published, CategoryEnum categoryEnum, Long userId, UserDTO user) {
         this.id = id;
         this.title = title;
         this.body = body;
         this.status = status;
         this.published = published;
+        this.categoryEnum = categoryEnum;
+        this.userId = userId;
+        this.user = user;
     }
 
-    public ContentDTO() {
+    public UserDTO getUser() {
+        return user;
+    }
+
+    public void setUser(UserDTO user) {
+        this.user = user;
     }
 
     public Long getId() {
@@ -33,6 +44,14 @@ public class ContentDTO extends RepresentationModel<ContentDTO> {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public String getTitle() {
@@ -51,14 +70,6 @@ public class ContentDTO extends RepresentationModel<ContentDTO> {
         this.body = body;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
     public boolean isPublished() {
         return published;
     }
@@ -73,5 +84,13 @@ public class ContentDTO extends RepresentationModel<ContentDTO> {
 
     public void setCategoryEnum(CategoryEnum categoryEnum) {
         this.categoryEnum = categoryEnum;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 }

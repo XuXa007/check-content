@@ -24,12 +24,12 @@ public class UserDataFetcher {
     }
 
     @DgsMutation
-    public UserDTO addUser(@InputArgument AddUserDTO userDTO) {
-        UserDTO user = new UserDTO();
-        user.setUsername(userDTO.getUsername());
-        user.setEmail(userDTO.getEmail());
-        user.setRole(userDTO.getRole());
-        userService.addUser(user);
-        return user;
+    public UserDTO addUser(@InputArgument UserDTO userDTO) {
+//        UserDTO user = new UserDTO();
+//        user.setUsername(userDTO.getUsername());
+//        user.setEmail(userDTO.getEmail());
+//        user.setRole(userDTO.getRole());
+        userService.addUser(userDTO);
+        return userDTO;
     }
 }

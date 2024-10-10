@@ -2,18 +2,32 @@ type Content {
     id: ID!
     title: String!
     body: String!
+    status: String!
+    published: Boolean!
+    categoryEnum: CategoryEnum!
+    userId: ID!
+    user: User!
 }
 
 type Query {
-    contents(titleFilter: String): [Content]
+    contents: [Content]
     getContentsByID(id: Int!): Content
 }
 
 type Mutation {
-    addContent(contentDTO: AddContentDTO): Content
+    addContent(contentDTO: ContentDTO): Content
 }
 
-input AddContentDTO {
+input ContentDTO {
     title: String!
     body: String!
+    userId: Int!
 }
+
+
+enum CategoryEnum {
+    NEWS,
+    SPORTS,
+    POLITICS
+}
+

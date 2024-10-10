@@ -1,15 +1,16 @@
 package com.example.checkContent.service;
 
+import com.example.checkContent.Enums.CategoryEnum;
 import com.example.checkContent.assembler.ContentModelAssembler;
 import com.example.checkContent.dto.ContentDTO;
+import com.example.checkContent.dto.UserDTO;
 import com.example.checkContent.model.Content;
-import com.example.checkContent.model.Response;
+import com.example.checkContent.model.User;
 import com.example.checkContent.repository.ContentRepository;
 import com.example.checkContent.repository.ResponseRepository;
+import com.example.checkContent.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,74 +24,91 @@ public class ContentService {
 
     private final ContentRepository contentRepository;
     private final ResponseRepository responseRepository;
+    private final UserRepository userRepository;
     private final ContentModelAssembler assembler;
 
     private final ModelMapper modelMapper;
 
     @Autowired
-    public ContentService(ContentRepository contentRepository, ResponseRepository responseRepository, ContentModelAssembler assembler, ModelMapper modelMapper) {
+    public ContentService(ContentRepository contentRepository, ResponseRepository responseRepository, UserRepository userRepository, ContentModelAssembler assembler, ModelMapper modelMapper) {
         this.contentRepository = contentRepository;
         this.responseRepository = responseRepository;
+        this.userRepository = userRepository;
         this.assembler = assembler;
         this.modelMapper = modelMapper;
     }
 
-    public void addContent(ContentDTO contentDTO) {
-        contentDTO.setStatus("WAITING");
-        contentDTO.setPublished(false);
-        Content content = modelMapper.map(contentDTO, Content.class);
-        contentRepository.saveAndFlush(content);
+    public ContentDTO addContent(ContentDTO contentDTO) {
+        Content content=modelMapper.map(contentDTO, Content.class);
+        User user=userRepository.findById(contentDTO.getUserId()).orElse(null);
+        content.setUser(user);
+
+//        content.setTitle(contentDTO.getTitle());
+//        content.setBody(contentDTO.getBody());
+        content.setCategoryEnum(CategoryEnum.NEWS);
+        content.setStatus("WAITING");
+        content.setPublished(false);
+
+
+        Content contentForSaveId = contentRepository.saveAndFlush(content);
+
+        ContentDTO contentToDTOForUser = modelMapper.map(contentForSaveId, ContentDTO.class);
+        contentToDTOForUser.setUser(modelMapper.map(user, UserDTO.class));
+        return contentToDTOForUser;
+//        contentDTO.setStatus("WAITING");
+//        contentDTO.setPublished(false);
+//        Content content = modelMapper.map(contentDTO, Content.class);
+//        contentRepository.saveAndFlush(content);
     }
 
-    public List<EntityModel<ContentDTO>> getAllContent() {
-//        List<EntityModel<ContentDTO>> contents = contentRepository.findAll().stream()
-//                .map(assembler::toModel)
-//                .collect(Collectors.toList());
-//        return (CollectionModel.of(contents));
-
+    public List<ContentDTO> getAllContent() {
         return contentRepository.findAll().stream()
-                .map(assembler::toModel)
+                .map(content -> modelMapper.map(content, ContentDTO.class))
                 .collect(Collectors.toList());
     }
 
 
-    public Optional<Content> getContentById(Long id) {
-        return contentRepository.findById(id);
+    public ContentDTO getContentById(Long id) {
+        Content content=contentRepository.findById(id).orElse(null);
+        return modelMapper.map(content, ContentDTO.class);
     }
 
     public void approveContent(Long id) {
-        Optional<Content> optionalContent = contentRepository.findById(id);
-
-        if (optionalContent.isPresent()) {
-            Content content = optionalContent.get();
-
-            if (content.getTitle().length() < MIN_TITLE_LENGTH) {
-                content.setStatus("REJECTED");
-                contentRepository.save(content);
-
-                Response response = responseRepository.findByContent(content);
-                if (response == null) {
-                    response = new Response();
-                    response.setContent(content);
-                }
-                response.setMessage("rejected: title must be at least " + MIN_TITLE_LENGTH);
-                responseRepository.save(response);
-            } else if (content.getBody().length() < MIN_BODY_LENGTH) {
-                content.setStatus("REJECTED");
-                contentRepository.save(content);
-
-                Response response = responseRepository.findByContent(content);
-                if (response == null) {
-                    response = new Response();
-                    response.setContent(content);
-                }
-                response.setMessage("rejected: body length must be at least " + MIN_BODY_LENGTH);
-                responseRepository.save(response);
-            } else {
-                content.setStatus("APPROVED");
-                contentRepository.save(content);
-            }
-        }
+        Content content=contentRepository.findById(id).orElse(null);
+        assert content != null;
+        content.setStatus("APPROVE");
+        contentRepository.save(content);
+//        Optional<Content> optionalContent = contentRepository.findById(id);
+//        if (optionalContent.isPresent()) {
+//            Content content = optionalContent.get();
+//
+//            if (content.getTitle().length() < MIN_TITLE_LENGTH) {
+//                content.setStatus("REJECTED");
+//                contentRepository.save(content);
+//
+//                Response response = responseRepository.findByContent(content);
+//                if (response == null) {
+//                    response = new Response();
+//                    response.setContent(content);
+//                }
+//                response.setMessage("rejected: title must be at least " + MIN_TITLE_LENGTH);
+//                responseRepository.save(response);
+//            } else if (content.getBody().length() < MIN_BODY_LENGTH) {
+//                content.setStatus("REJECTED");
+//                contentRepository.save(content);
+//
+//                Response response = responseRepository.findByContent(content);
+//                if (response == null) {
+//                    response = new Response();
+//                    response.setContent(content);
+//                }
+//                response.setMessage("rejected: body length must be at least " + MIN_BODY_LENGTH);
+//                responseRepository.save(response);
+//            } else {
+//                content.setStatus("APPROVED");
+//                contentRepository.save(content);
+//            }
+//        }
     }
 
 

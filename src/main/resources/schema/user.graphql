@@ -2,7 +2,7 @@ type User {
     id: ID!
     username: String!
     email: String!
-    role: String!
+    role: RoleEnum!
 }
 
 extend type Query {
@@ -10,11 +10,17 @@ extend type Query {
 }
 
 extend type Mutation {
-    addUser(userDTO: AddUserDTO!): User
+    addUser(userDTO: UserDTO!): User
 }
 
-input AddUserDTO {
+input UserDTO {
     username: String!
     email: String!
-    role: String!
+    role: RoleEnum!
+}
+
+enum RoleEnum {
+    User,
+    Admin,
+    Moderator
 }

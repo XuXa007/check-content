@@ -2,7 +2,6 @@ package com.example.checkContent.service;
 
 import com.example.checkContent.Enums.RoleEnum;
 import com.example.checkContent.assembler.UserModelAssembler;
-import com.example.checkContent.dto.ContentDTO;
 import com.example.checkContent.dto.UserDTO;
 import com.example.checkContent.model.User;
 import com.example.checkContent.repository.UserRepository;
@@ -11,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -34,10 +32,11 @@ public class UserService {
         return userRepository.findById(id);
     }
 
-    public void addUser(UserDTO userDTO) {
+    public UserDTO addUser(UserDTO userDTO) {
         User user = modelMapper.map(userDTO, User.class);
         user.setRole(RoleEnum.Admin);
         userRepository.saveAndFlush(user);
+        return modelMapper.map(user, UserDTO.class);
     }
 
     public List<EntityModel<UserDTO>> getAllUsers() {
