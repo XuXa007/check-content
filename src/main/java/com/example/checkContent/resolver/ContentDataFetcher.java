@@ -23,7 +23,6 @@ public class ContentDataFetcher {
         return contentService.getAllContentDTO();
     }
 
-
     @DgsQuery
     public Optional<ContentDTO> getContentsByID(@InputArgument Long id) {
         return contentService.getContentByIdDTO(id);
@@ -35,3 +34,5 @@ public class ContentDataFetcher {
     }
 
 }
+
+

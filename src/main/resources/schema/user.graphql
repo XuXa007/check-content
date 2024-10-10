@@ -7,6 +7,7 @@ type User {
 
 extend type Query {
     users: [User]
+    sortedUsers(sortBy: String = "USERNAME_ASC"): [User]
 }
 
 extend type Mutation {
@@ -24,3 +25,8 @@ enum RoleEnum {
     Admin,
     Moderator
 }
+
+enum UserSortBy {
+    USERNAME_ASC
+}
+

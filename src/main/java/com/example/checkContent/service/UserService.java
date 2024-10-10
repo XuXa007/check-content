@@ -7,6 +7,7 @@ import com.example.checkContent.model.User;
 import com.example.checkContent.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.stereotype.Service;
 
@@ -50,6 +51,21 @@ public class UserService {
     public List<UserDTO> getAllUsersDTO() {
         return userRepository.findAll().stream()
                 .map(u -> modelMapper.map(u, UserDTO.class))
+                .collect(Collectors.toList());
+    }
+
+    public List<UserDTO> getSortedUsers(String sortBy) {
+        Sort sort;
+        if ("USERNAME_DESC".equals(sortBy)) {
+            sort = Sort.by(Sort.Direction.DESC, "username");
+        } else {
+            sort = Sort.by(Sort.Direction.ASC, "username");
+        }
+
+        List<User> users = userRepository.findAll(sort);
+
+        return users.stream()
+                .map(user -> modelMapper.map(user, UserDTO.class))
                 .collect(Collectors.toList());
     }
 }

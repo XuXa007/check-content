@@ -1,6 +1,5 @@
 package com.example.checkContent.resolver;
 
-import com.example.checkContent.dto.AddUserDTO;
 import com.example.checkContent.dto.UserDTO;
 import com.example.checkContent.service.UserService;
 import com.netflix.graphql.dgs.DgsComponent;
@@ -21,6 +20,16 @@ public class UserDataFetcher {
     @DgsQuery
     public List<UserDTO> users() {
         return userService.getAllUsersDTO();
+    }
+
+//    @DgsQuery
+//    public List<UserDTO> sortedUsers(@InputArgument(name = "sortBy") String sortBy) {
+//        return userService.getSortedUsers(sortBy);
+//    }
+
+    @DgsQuery
+    public List<UserDTO> sortedUsers(@InputArgument String sortBy) {
+        return userService.getSortedUsers(sortBy);
     }
 
     @DgsMutation
