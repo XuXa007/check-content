@@ -12,14 +12,14 @@ public class ContentDTO extends RepresentationModel<ContentDTO> {
     private CategoryEnum categoryEnum;
     private Long userId;
 
-    private UserDTO user;
+//    private UserDTO user;
 
 
     public ContentDTO() {
     }
 
 
-    public ContentDTO(Long id, String title, String body, String status, boolean published, CategoryEnum categoryEnum, Long userId, UserDTO user) {
+    public ContentDTO(Long id, String title, String body, String status, boolean published, CategoryEnum categoryEnum, Long userId) {
         this.id = id;
         this.title = title;
         this.body = body;
@@ -27,16 +27,15 @@ public class ContentDTO extends RepresentationModel<ContentDTO> {
         this.published = published;
         this.categoryEnum = categoryEnum;
         this.userId = userId;
-        this.user = user;
     }
 
-    public UserDTO getUser() {
-        return user;
-    }
-
-    public void setUser(UserDTO user) {
-        this.user = user;
-    }
+//    public UserDTO getUser() {
+//        return user;
+//    }
+//
+//    public void setUser(UserDTO user) {
+//        this.user = user;
+//    }
 
     public Long getId() {
         return id;

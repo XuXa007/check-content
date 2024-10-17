@@ -3,13 +3,16 @@ package com.example.checkContent.service;
 import com.example.checkContent.Enums.CategoryEnum;
 import com.example.checkContent.assembler.ContentModelAssembler;
 import com.example.checkContent.dto.ContentDTO;
-import com.example.checkContent.dto.UserDTO;
+import com.example.checkContent.rabbit.RabbitMQConfiguration;
+import com.example.checkContent.rabbit.RabbitMQSender;
 import com.example.checkContent.model.Content;
 import com.example.checkContent.model.User;
 import com.example.checkContent.repository.ContentRepository;
 import com.example.checkContent.repository.ResponseRepository;
 import com.example.checkContent.repository.UserRepository;
 import org.modelmapper.ModelMapper;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,38 +30,40 @@ public class ContentService {
     private final UserRepository userRepository;
     private final ContentModelAssembler assembler;
 
+    private final RabbitMQSender rabbitMQSender;
+    private final RabbitTemplate rabbitTemplate;
     private final ModelMapper modelMapper;
 
+    static final String exchangeName="contentToModerationQueue";
+
     @Autowired
-    public ContentService(ContentRepository contentRepository, ResponseRepository responseRepository, UserRepository userRepository, ContentModelAssembler assembler, ModelMapper modelMapper) {
+    public ContentService(ContentRepository contentRepository, ResponseRepository responseRepository,
+                          UserRepository userRepository, ContentModelAssembler assembler,
+                          RabbitMQSender rabbitMQSender, RabbitTemplate rabbitTemplate, ModelMapper modelMapper) {
         this.contentRepository = contentRepository;
         this.responseRepository = responseRepository;
         this.userRepository = userRepository;
         this.assembler = assembler;
+        this.rabbitMQSender = rabbitMQSender;
+        this.rabbitTemplate = rabbitTemplate;
         this.modelMapper = modelMapper;
     }
 
     public ContentDTO addContent(ContentDTO contentDTO) {
         Content content=modelMapper.map(contentDTO, Content.class);
-        User user=userRepository.findById(contentDTO.getUserId()).orElse(null);
-        content.setUser(user);
 
-//        content.setTitle(contentDTO.getTitle());
-//        content.setBody(contentDTO.getBody());
         content.setCategoryEnum(CategoryEnum.NEWS);
         content.setStatus("WAITING");
         content.setPublished(false);
 
+        if (contentDTO.getUserId() != null) {
+            User user = userRepository.findById(contentDTO.getUserId()).orElse(null);
+            content.setUser(user);
+        }
+        contentRepository.saveAndFlush(content);
 
-        Content contentForSaveId = contentRepository.saveAndFlush(content);
-
-        ContentDTO contentToDTOForUser = modelMapper.map(contentForSaveId, ContentDTO.class);
-        contentToDTOForUser.setUser(modelMapper.map(user, UserDTO.class));
-        return contentToDTOForUser;
-//        contentDTO.setStatus("WAITING");
-//        contentDTO.setPublished(false);
-//        Content content = modelMapper.map(contentDTO, Content.class);
-//        contentRepository.saveAndFlush(content);
+        rabbitMQSender.sendToModeration(content.getId());
+        return modelMapper.map(content, ContentDTO.class);
     }
 
     public List<ContentDTO> getAllContent() {
@@ -73,12 +78,21 @@ public class ContentService {
         return modelMapper.map(content, ContentDTO.class);
     }
 
+    @RabbitListener(queues = RabbitMQConfiguration.queueContentName)
     public void approveContent(Long id) {
-        Content content=contentRepository.findById(id).orElse(null);
-        assert content != null;
-        content.setStatus("APPROVE");
-        contentRepository.save(content);
-//        Optional<Content> optionalContent = contentRepository.findById(id);
+        System.out.println("Получено сообщение о контенте ID: " + id);
+
+        Optional<Content> optionalContent = contentRepository.findById(id);
+        if (optionalContent.isPresent()) {
+            Content content = optionalContent.get();
+            content.setStatus("APPROVED");
+            contentRepository.save(content);
+            System.out.printf("Контент с ID "+id+ " был одобрен");
+        } else {
+            System.out.printf("Контент с ID "+id+" не найден");
+        }
+
+
 //        if (optionalContent.isPresent()) {
 //            Content content = optionalContent.get();
 //
@@ -111,8 +125,9 @@ public class ContentService {
 //        }
     }
 
-
+    @RabbitListener(queues = RabbitMQConfiguration.queueContentName)
     public boolean publishContent(Long id) {
+        System.out.println("Получено сообщение о контенте ID: " + id);
         Optional<Content> contents = contentRepository.findById(id);
         if (contents.isPresent()) {
             Content content = contents.get();
@@ -120,6 +135,8 @@ public class ContentService {
                 content.setPublished(true);
                 content.setStatus("PUBLISHED");
                 contentRepository.save(content);
+                System.out.println("Опубликовано: " + id);
+
                 return true;
             }
         }

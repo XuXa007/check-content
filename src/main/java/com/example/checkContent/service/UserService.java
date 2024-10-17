@@ -4,6 +4,7 @@ import com.example.checkContent.Enums.RoleEnum;
 import com.example.checkContent.assembler.UserModelAssembler;
 import com.example.checkContent.dto.UserDTO;
 import com.example.checkContent.model.User;
+import com.example.checkContent.rabbit.RabbitMQSender;
 import com.example.checkContent.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,23 +22,27 @@ public class UserService {
 
     private final ModelMapper modelMapper;
     private final UserModelAssembler assembler;
-
+    private final RabbitMQSender rabbitMQSender;
     @Autowired
-    public UserService(UserRepository userRepository, ModelMapper modelMapper, UserModelAssembler assembler) {
+    public UserService(UserRepository userRepository, ModelMapper modelMapper,
+                       UserModelAssembler assembler, RabbitMQSender rabbitMQSender) {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
         this.assembler = assembler;
+        this.rabbitMQSender = rabbitMQSender;
     }
 
     public Optional<User> getUserById(Long id) {
         return userRepository.findById(id);
     }
 
-    public UserDTO addUser(UserDTO userDTO) {
+    public void addUser(UserDTO userDTO) {
         User user = modelMapper.map(userDTO, User.class);
         user.setRole(RoleEnum.Admin);
         userRepository.saveAndFlush(user);
-        return modelMapper.map(user, UserDTO.class);
+        modelMapper.map(user, UserDTO.class);
+
+        rabbitMQSender.messAddUser(user.getUsername());
     }
 
     public List<EntityModel<UserDTO>> getAllUsers() {

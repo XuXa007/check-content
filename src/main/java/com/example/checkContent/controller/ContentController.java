@@ -6,6 +6,7 @@ import com.example.checkContent.assembler.ContentModelAssembler;
 import com.example.checkContent.service.ContentService;
 import com.example.checkContent.service.ResponseService;
 import org.modelmapper.ModelMapper;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -18,22 +19,27 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/content")
 public class ContentController {
+    static final String exchangeName="contentToModerationQueue";
     private final ContentService contentService;
     private final ResponseService responseService;
     private final ContentModelAssembler assembler;
     private final ModelMapper modelMapper;
+    private final RabbitTemplate rabbitTemplate;
 
     @Autowired
-    public ContentController(ContentService contentService, ResponseService responseService, ContentModelAssembler assembler, ModelMapper modelMapper) {
+    public ContentController(ContentService contentService, ResponseService responseService,
+                             ContentModelAssembler assembler, ModelMapper modelMapper, RabbitTemplate rabbitTemplate) {
         this.contentService = contentService;
         this.responseService = responseService;
         this.assembler = assembler;
         this.modelMapper = modelMapper;
+        this.rabbitTemplate = rabbitTemplate;
     }
 
 
     @PostMapping
     public void addContent(@RequestBody ContentDTO contentDTO) {
+//        rabbitTemplate.convertAndSend("contentToModerationQueue", contentDTO.getId());
         contentService.addContent(contentDTO);
     }
 
@@ -58,6 +64,7 @@ public class ContentController {
     @PatchMapping("/approve/{id}")
     public ResponseEntity<String> approveContent(@PathVariable Long id) {
         contentService.approveContent(id);
+
         ContentDTO content = contentService.getContentById(id);
         if (content.getStatus().equals("APPROVED")) {
             return ResponseEntity.ok("yes");
