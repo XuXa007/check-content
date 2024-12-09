@@ -1,6 +1,7 @@
 package com.example.checkContent.model;
 
 import com.example.checkContent.Enums.RoleEnum;
+import com.example.checkContent.Enums.UserStatus;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -17,6 +18,25 @@ public class User extends Base {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Content> contents;
 
+    @Enumerated(EnumType.STRING)
+    private UserStatus status = UserStatus.ACTIVE;
+
+    private int rating = 100;
+
+    private int violationCount = 0;
+
+    public User() {
+    }
+
+    public User(String username, String email, RoleEnum role, List<Content> contents, UserStatus status, int rating, int violationCount) {
+        this.username = username;
+        this.email = email;
+        this.role = role;
+        this.contents = contents;
+        this.status = status;
+        this.rating = rating;
+        this.violationCount = violationCount;
+    }
 
     public String getUsername() {
         return username;
@@ -34,14 +54,6 @@ public class User extends Base {
         this.email = email;
     }
 
-    public List<Content> getContents() {
-        return contents;
-    }
-
-    public void setContents(List<Content> contents) {
-        this.contents = contents;
-    }
-
     public RoleEnum getRole() {
         return role;
     }
@@ -50,11 +62,35 @@ public class User extends Base {
         this.role = role;
     }
 
-    //    public List<Response> getResponses() {
-//        return responses;
-//    }
-//
-//    public void setResponses(List<Response> responses) {
-//        this.responses = responses;
-//    }
+    public List<Content> getContents() {
+        return contents;
+    }
+
+    public void setContents(List<Content> contents) {
+        this.contents = contents;
+    }
+
+    public UserStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(UserStatus status) {
+        this.status = status;
+    }
+
+    public int getRating() {
+        return rating;
+    }
+
+    public void setRating(int rating) {
+        this.rating = rating;
+    }
+
+    public int getViolationCount() {
+        return violationCount;
+    }
+
+    public void setViolationCount(int violationCount) {
+        this.violationCount = violationCount;
+    }
 }

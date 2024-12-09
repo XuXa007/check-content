@@ -34,7 +34,7 @@ Content-Type: application/json
 
 {
   "title": "заголовок контентаФФФФ",
-  "body": "Текст контента, который возможно надо поменять)",
+  "body": "Текст контента, который возможно надо поменять)))))",
   "userId": "1"
 }
 
@@ -60,21 +60,7 @@ Content-Type: application/json
   "title": "UPDATE заголовок контента",
   "body": "Текст контента, который возможно надо поменять)Текст контента, который возможно надо поменять)Текст контента, который возможно надо поменять)Текст контента, который ",
   "status": "REJECTED",
-  "published": false,
-  "_links": {
-    "self": {
-      "href": "http://localhost:8080/content/1"
-    },
-    "re approve": {
-      "href": "http://localhost:8080/content/approve/1"
-    },
-    "update": {
-      "href": "http://localhost:8080/content/update/1"
-    },
-    "delete": {
-      "href": "http://localhost:8080/content/delete/1"
-    }
-  }
+  "published": false
 }
 
 ###

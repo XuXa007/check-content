@@ -3,6 +3,8 @@ package com.example.checkContent.service;
 import com.example.checkContent.Enums.CategoryEnum;
 import com.example.checkContent.assembler.ContentModelAssembler;
 import com.example.checkContent.dto.ContentDTO;
+import com.example.checkContent.dto.ContentModerationForMessage;
+import com.example.checkContent.model.Response;
 import com.example.checkContent.rabbit.RabbitMQConfiguration;
 import com.example.checkContent.rabbit.RabbitMQSender;
 import com.example.checkContent.model.Content;
@@ -60,10 +62,22 @@ public class ContentService {
             User user = userRepository.findById(contentDTO.getUserId()).orElse(null);
             content.setUser(user);
         }
-        contentRepository.saveAndFlush(content);
 
-        rabbitMQSender.sendToModeration(content.getId());
+        content = contentRepository.saveAndFlush(content);
+        sendToModeration(content);
         return modelMapper.map(content, ContentDTO.class);
+    }
+
+    private void sendToModeration(Content content) {
+        try {
+            System.out.println("Контент отправлен на модерцию с id " + content.getId());
+
+            ContentModerationForMessage message = ContentModerationForMessage.fromContent(content);
+            rabbitMQSender.sendToModeration(message);
+        } catch (Exception e) {
+            System.out.println("Ошибка модерции контента с id " + content.getId());
+
+        }
     }
 
     public List<ContentDTO> getAllContent() {
@@ -78,18 +92,44 @@ public class ContentService {
         return modelMapper.map(content, ContentDTO.class);
     }
 
-    @RabbitListener(queues = RabbitMQConfiguration.queueContentName)
+//    @RabbitListener(queues = RabbitMQConfiguration.queueContentName)
     public void approveContent(Long id) {
-        System.out.println("Получено сообщение о контенте ID: " + id);
-
         Optional<Content> optionalContent = contentRepository.findById(id);
         if (optionalContent.isPresent()) {
             Content content = optionalContent.get();
-            content.setStatus("APPROVED");
-            contentRepository.save(content);
-            System.out.printf("Контент с ID "+id+ " был одобрен");
+            if (content.getTitle().length() < MIN_TITLE_LENGTH) {
+                content.setStatus("REJECTED");
+                contentRepository.save(content);
+
+                Response response = responseRepository.findByContent(content);
+                if (response == null) {
+                    response = new Response();
+                    response.setContent(content);
+                }
+                response.setMessage("rejected: title must be at least " + MIN_TITLE_LENGTH);
+                responseRepository.save(response);
+//                System.out.println("Контент с ID "+id+ " не одобрен из-за длинны заголовка");
+
+            } else if (content.getBody().length() < MIN_BODY_LENGTH) {
+                content.setStatus("REJECTED");
+                contentRepository.save(content);
+
+                Response response = responseRepository.findByContent(content);
+                if (response == null) {
+                    response = new Response();
+                    response.setContent(content);
+                }
+                response.setMessage("rejected: body length must be at least " + MIN_BODY_LENGTH);
+                responseRepository.save(response);
+
+//                System.out.println("Контент с ID "+id+ " не одобрен из-за длинны тела");
+            } else {
+                content.setStatus("APPROVED");
+                contentRepository.save(content);
+//                System.out.println("Контент с ID "+id+ " был одобрен");
+            }
         } else {
-            System.out.printf("Контент с ID "+id+" не найден");
+//            System.out.println("Контент с ID "+id+" не найден");
         }
 
 
@@ -123,11 +163,12 @@ public class ContentService {
 //                contentRepository.save(content);
 //            }
 //        }
+
     }
 
-    @RabbitListener(queues = RabbitMQConfiguration.queueContentName)
+//    @RabbitListener(queues = RabbitMQConfiguration.queueContentName)
     public boolean publishContent(Long id) {
-        System.out.println("Получено сообщение о контенте ID: " + id);
+//        System.out.println("Контент : " + id+" на публикации");
         Optional<Content> contents = contentRepository.findById(id);
         if (contents.isPresent()) {
             Content content = contents.get();
@@ -135,7 +176,12 @@ public class ContentService {
                 content.setPublished(true);
                 content.setStatus("PUBLISHED");
                 contentRepository.save(content);
-                System.out.println("Опубликовано: " + id);
+
+                Content content1 = contentRepository.findContentById(content.getId());
+
+                rabbitMQSender.publishedContent(content1);
+
+//                System.out.println("Опубликован контент: " + id);
 
                 return true;
             }

@@ -1,0 +1,70 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'org.springframework.boot' version '3.2.0'
+    id 'io.spring.dependency-management' version '1.1.4'
+    id 'com.google.protobuf' version '0.9.4'
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-hateoas'
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
+    implementation 'org.jetbrains:annotations:16.0.1'
+    implementation 'com.graphql-java:graphql-java-spring-boot-starter-webmvc:2021-10-25T04-50-54-fbc162f'
+    implementation 'com.graphql-java:graphql-java:22.3'
+    implementation 'io.grpc:grpc-netty-shaded:1.58.0'
+    implementation 'io.grpc:grpc-protobuf:1.58.0'
+    implementation 'io.grpc:grpc-stub:1.58.0'
+    implementation 'org.modelmapper:modelmapper:3.1.1'
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    implementation 'javax.annotation:javax.annotation-api:1.3.2'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+    runtimeOnly 'com.h2database:h2:2.2.224'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+description = 'checkContent'
+java.sourceCompatibility = JavaVersion.VERSION_20
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from(components.java)
+        }
+    }
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.25.1"
+    }
+    plugins {
+        grpc {
+            artifact = 'io.grpc:protoc-gen-grpc-java:1.61.0'
+        }
+    }
+    generateProtoTasks {
+        all()*.plugins { grpc {} }
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+tasks.withType(Javadoc) {
+    options.encoding = 'UTF-8'
+}
+
+test {
+    useJUnitPlatform()
+}

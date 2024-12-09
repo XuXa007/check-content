@@ -18,8 +18,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserService {
-    private UserRepository userRepository;
-
+    private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final UserModelAssembler assembler;
     private final RabbitMQSender rabbitMQSender;
@@ -42,7 +41,7 @@ public class UserService {
         userRepository.saveAndFlush(user);
         modelMapper.map(user, UserDTO.class);
 
-        rabbitMQSender.messAddUser(user.getUsername());
+//        rabbitMQSender.userCreated(userDTO);
     }
 
     public List<EntityModel<UserDTO>> getAllUsers() {

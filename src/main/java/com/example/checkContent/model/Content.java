@@ -4,11 +4,12 @@ import com.example.checkContent.Enums.CategoryEnum;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Entity
 @Table(name = "contents")
-public class Content extends Base {
+public class Content extends Base implements Serializable {
     private String title;
     @Column(length = 1000)
     private String body;
@@ -19,6 +20,7 @@ public class Content extends Base {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
+    @JsonManagedReference
     private User user;
 
     @OneToMany(mappedBy = "content", cascade = CascadeType.ALL)
@@ -88,5 +90,18 @@ public class Content extends Base {
 
     public void setResponses(List<Response> responses) {
         this.responses = responses;
+    }
+
+    @Override
+    public String toString() {
+        return "Content{" +
+                "title='" + title + '\'' +
+                ", body='" + body + '\'' +
+                ", status='" + status + '\'' +
+                ", published=" + published +
+                ", categoryEnum=" + categoryEnum +
+                ", user=" + user +
+                ", responses=" + responses +
+                '}';
     }
 }

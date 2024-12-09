@@ -1,0 +1,8 @@
+rootProject.name = 'checkContent'
+
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+}
