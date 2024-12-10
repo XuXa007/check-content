@@ -33,8 +33,8 @@ POST localhost:8081/content
 Content-Type: application/json
 
 {
-  "title": "заголовок контентаФФФФ",
-  "body": "Текст контента, который возможно надо поменять)))))",
+  "title": "заголовок быстрые деньги",
+  "body": "Текст быстрые деньги, который возможно надо поменять)))))",
   "userId": "1"
 }
 
@@ -44,7 +44,7 @@ PATCH localhost:8081/content/published/1
 
 ###
 # @name approve
-PATCH localhost:8081/content/approve/1
+PATCH localhost:8081/content/approve/4
 
 ###
 # @name New Request
@@ -56,7 +56,7 @@ PATCH localhost:8081/content/update/1
 Content-Type: application/json
 
 {
-  "id": 1,
+  "id": 4,
   "title": "UPDATE заголовок контента",
   "body": "Текст контента, который возможно надо поменять)Текст контента, который возможно надо поменять)Текст контента, который возможно надо поменять)Текст контента, который ",
   "status": "REJECTED",

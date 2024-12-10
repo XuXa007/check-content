@@ -25,27 +25,4 @@ public class RabbitMQSender {
         rabbitTemplate.convertAndSend(RabbitMQConfiguration.exchangeName, "publish.key", content);
     }
 
-//    public void sendToModeration(Content content) {
-//        System.out.println("Отправка сообщения на модерацию контента с ID: " + content.getId());
-//        rabbitTemplate.convertAndSend(RabbitMQConfiguration.exchangeName, "moder.key", content);
-//    }
-//
-//    public void messAddUser(Content content) {
-//        System.out.println("Отправка сообщения в RabbitMQ о добавлении ID: " + content);
-//        rabbitTemplate.convertAndSend(RabbitMQConfiguration.queueUserName, "user.key", content);
-//    }
-//
-//    public void publishedContent(Content content) {
-//        System.out.println("Публикация контента: " + content.getId());
-//        rabbitTemplate.convertAndSend(RabbitMQConfiguration.exchangeName, "publish.key", content);
-//    }
-//
-//    public void userCreated(Content content) {
-//        System.out.println("Пользователь создан с айди: " +content.getId());
-//        rabbitTemplate.convertAndSend(RabbitMQConfiguration.queueUserName, "user.key", id);
-//    }
-
-
-
-
 }

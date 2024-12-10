@@ -11,5 +11,5 @@ import java.util.List;
 @Repository
 public interface ResponseRepository extends JpaRepository<Response, Long> {
     Response findByContent(Content content);
-    List<Response> findByUser(User user);
+//    List<Response> findByUser(User user);
 }

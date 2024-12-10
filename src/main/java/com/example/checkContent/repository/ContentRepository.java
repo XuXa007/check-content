@@ -9,8 +9,8 @@ import java.util.List;
 
 @Repository
 public interface ContentRepository extends JpaRepository<Content, Long> {
-    List<ContentDTO> findAllByPublishedTrue();
-    Content findContentById(Long id);
+//    List<ContentDTO> findAllByPublishedTrue();
+//    Content findContentById(Long id);
 }
 
 

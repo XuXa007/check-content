@@ -23,6 +23,7 @@ public class ContentModerationForMessage implements Serializable {
         this.userId = userId;
     }
 
+    // Фабричный метод
     public static ContentModerationForMessage fromContent(Content content) {
         return new ContentModerationForMessage(
                 content.getId(),
@@ -31,6 +32,9 @@ public class ContentModerationForMessage implements Serializable {
                 content.getCategoryEnum(),
                 content.getUser() != null ? content.getUser().getId() : null
         );
+    }
+
+    public ContentModerationForMessage() {
     }
 
     public Long getId() {

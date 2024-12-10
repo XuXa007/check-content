@@ -1,9 +1,11 @@
 package com.example.checkContent.service;
 
 import com.example.checkContent.Enums.CategoryEnum;
+import com.example.checkContent.Enums.ContentStatus;
 import com.example.checkContent.assembler.ContentModelAssembler;
 import com.example.checkContent.dto.ContentDTO;
 import com.example.checkContent.dto.ContentModerationForMessage;
+import com.example.checkContent.dto.ModerationResult;
 import com.example.checkContent.model.Response;
 import com.example.checkContent.rabbit.RabbitMQConfiguration;
 import com.example.checkContent.rabbit.RabbitMQSender;
@@ -19,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -30,32 +33,24 @@ public class ContentService {
     private final ContentRepository contentRepository;
     private final ResponseRepository responseRepository;
     private final UserRepository userRepository;
-    private final ContentModelAssembler assembler;
-
     private final RabbitMQSender rabbitMQSender;
-    private final RabbitTemplate rabbitTemplate;
     private final ModelMapper modelMapper;
 
-    static final String exchangeName="contentToModerationQueue";
-
     @Autowired
-    public ContentService(ContentRepository contentRepository, ResponseRepository responseRepository,
-                          UserRepository userRepository, ContentModelAssembler assembler,
-                          RabbitMQSender rabbitMQSender, RabbitTemplate rabbitTemplate, ModelMapper modelMapper) {
+    public ContentService(ContentRepository contentRepository, ResponseRepository responseRepository, UserRepository userRepository, RabbitMQSender rabbitMQSender, ModelMapper modelMapper) {
         this.contentRepository = contentRepository;
         this.responseRepository = responseRepository;
         this.userRepository = userRepository;
-        this.assembler = assembler;
         this.rabbitMQSender = rabbitMQSender;
-        this.rabbitTemplate = rabbitTemplate;
         this.modelMapper = modelMapper;
     }
+
 
     public ContentDTO addContent(ContentDTO contentDTO) {
         Content content=modelMapper.map(contentDTO, Content.class);
 
         content.setCategoryEnum(CategoryEnum.NEWS);
-        content.setStatus("WAITING");
+        content.setStatus(ContentStatus.WAITING);
         content.setPublished(false);
 
         if (contentDTO.getUserId() != null) {
@@ -71,13 +66,49 @@ public class ContentService {
     private void sendToModeration(Content content) {
         try {
             System.out.println("Контент отправлен на модерцию с id " + content.getId());
-
             ContentModerationForMessage message = ContentModerationForMessage.fromContent(content);
             rabbitMQSender.sendToModeration(message);
         } catch (Exception e) {
             System.out.println("Ошибка модерции контента с id " + content.getId());
-
         }
+    }
+
+    public ContentDTO approveContent(Long id) {
+        Content content=contentRepository.findById(id).orElseThrow(() -> new RuntimeException("Контент не нашелся"));
+        if (content.getTitle().length()<MIN_TITLE_LENGTH) {
+            rejectContent(content, "Заголовок должен быть больше " + MIN_TITLE_LENGTH + " символов");
+        } else if (content.getBody().length()<MIN_BODY_LENGTH) {
+            rejectContent(content, "Осноной текст должен быть больше " + MIN_BODY_LENGTH + " символов");
+        } else {
+            content.setStatus(ContentStatus.APPROVED);
+            contentRepository.save(content);
+        }
+        return modelMapper.map(content, ContentDTO.class);
+    }
+
+    public void rejectContent(Content content, String reason) {
+        content.setStatus(ContentStatus.REJECTED);
+        contentRepository.save(content);
+
+        Response response=responseRepository.findByContent(content);
+        if (response==null) {
+            response=new Response();
+            response.setContent(content);
+        }
+        response.setMessage(reason);
+        responseRepository.save(response);
+    }
+
+    public ContentDTO publishContent(Long id) {
+        Content content = contentRepository.findById(id).orElseThrow(RuntimeException::new);
+        if (content.getStatus()==ContentStatus.APPROVED) {
+            content.setPublished(true);
+            content.setStatus(ContentStatus.PUBLISHED);
+            content=contentRepository.save(content);
+            rabbitMQSender.publishedContent(content);
+            return modelMapper.map(content, ContentDTO.class);
+        }
+        throw new RuntimeException("Контент не опубликован");
     }
 
     public List<ContentDTO> getAllContent() {
@@ -88,106 +119,11 @@ public class ContentService {
 
 
     public ContentDTO getContentById(Long id) {
-        Content content=contentRepository.findById(id).orElse(null);
-        return modelMapper.map(content, ContentDTO.class);
+        return contentRepository.findById(id)
+                .map(content -> modelMapper.map(content, ContentDTO.class))
+                .orElseThrow(RuntimeException::new);
     }
 
-//    @RabbitListener(queues = RabbitMQConfiguration.queueContentName)
-    public void approveContent(Long id) {
-        Optional<Content> optionalContent = contentRepository.findById(id);
-        if (optionalContent.isPresent()) {
-            Content content = optionalContent.get();
-            if (content.getTitle().length() < MIN_TITLE_LENGTH) {
-                content.setStatus("REJECTED");
-                contentRepository.save(content);
-
-                Response response = responseRepository.findByContent(content);
-                if (response == null) {
-                    response = new Response();
-                    response.setContent(content);
-                }
-                response.setMessage("rejected: title must be at least " + MIN_TITLE_LENGTH);
-                responseRepository.save(response);
-//                System.out.println("Контент с ID "+id+ " не одобрен из-за длинны заголовка");
-
-            } else if (content.getBody().length() < MIN_BODY_LENGTH) {
-                content.setStatus("REJECTED");
-                contentRepository.save(content);
-
-                Response response = responseRepository.findByContent(content);
-                if (response == null) {
-                    response = new Response();
-                    response.setContent(content);
-                }
-                response.setMessage("rejected: body length must be at least " + MIN_BODY_LENGTH);
-                responseRepository.save(response);
-
-//                System.out.println("Контент с ID "+id+ " не одобрен из-за длинны тела");
-            } else {
-                content.setStatus("APPROVED");
-                contentRepository.save(content);
-//                System.out.println("Контент с ID "+id+ " был одобрен");
-            }
-        } else {
-//            System.out.println("Контент с ID "+id+" не найден");
-        }
-
-
-//        if (optionalContent.isPresent()) {
-//            Content content = optionalContent.get();
-//
-//            if (content.getTitle().length() < MIN_TITLE_LENGTH) {
-//                content.setStatus("REJECTED");
-//                contentRepository.save(content);
-//
-//                Response response = responseRepository.findByContent(content);
-//                if (response == null) {
-//                    response = new Response();
-//                    response.setContent(content);
-//                }
-//                response.setMessage("rejected: title must be at least " + MIN_TITLE_LENGTH);
-//                responseRepository.save(response);
-//            } else if (content.getBody().length() < MIN_BODY_LENGTH) {
-//                content.setStatus("REJECTED");
-//                contentRepository.save(content);
-//
-//                Response response = responseRepository.findByContent(content);
-//                if (response == null) {
-//                    response = new Response();
-//                    response.setContent(content);
-//                }
-//                response.setMessage("rejected: body length must be at least " + MIN_BODY_LENGTH);
-//                responseRepository.save(response);
-//            } else {
-//                content.setStatus("APPROVED");
-//                contentRepository.save(content);
-//            }
-//        }
-
-    }
-
-//    @RabbitListener(queues = RabbitMQConfiguration.queueContentName)
-    public boolean publishContent(Long id) {
-//        System.out.println("Контент : " + id+" на публикации");
-        Optional<Content> contents = contentRepository.findById(id);
-        if (contents.isPresent()) {
-            Content content = contents.get();
-            if ("APPROVED".equals(content.getStatus())) {
-                content.setPublished(true);
-                content.setStatus("PUBLISHED");
-                contentRepository.save(content);
-
-                Content content1 = contentRepository.findContentById(content.getId());
-
-                rabbitMQSender.publishedContent(content1);
-
-//                System.out.println("Опубликован контент: " + id);
-
-                return true;
-            }
-        }
-        return false;
-    }
 
     public boolean deleteContent(Long id) {
         if (contentRepository.existsById(id)) {
@@ -197,9 +133,9 @@ public class ContentService {
         return false;
     }
 
-    public List<ContentDTO> getPublishedContent() {
-        return contentRepository.findAllByPublishedTrue();
-    }
+//    public List<ContentDTO> getPublishedContent() {
+//        return contentRepository.findAllByPublishedTrue();
+//    }
 
     public boolean updateContent(Long id, String newTit, String newBody) {
         Optional<Content> optionalContent=contentRepository.findById(id);
@@ -221,5 +157,23 @@ public class ContentService {
 
     public Optional<ContentDTO> getContentByIdDTO(Long id) {
         return contentRepository.findById(id).map(content -> modelMapper.map(content, ContentDTO.class));
+    }
+
+    @RabbitListener(queues = "moderation.results")
+    public void handleModerationResult(ModerationResult moderationResult) {
+
+        Content content = contentRepository.findById(moderationResult.getContentId())
+                .orElseThrow(() -> new RuntimeException("Контент не найден"));
+
+
+        content.setStatus(ContentStatus.valueOf(moderationResult.getStatus()));
+        contentRepository.save(content);
+
+        Response response = new Response();
+        response.setContent(content);
+        response.setMessage(moderationResult.getMes());
+        responseRepository.save(response);
+
+        System.out.println("Получен результат модерации для контента " + moderationResult.getContentId() + ": " + moderationResult.getStatus());
     }
 }

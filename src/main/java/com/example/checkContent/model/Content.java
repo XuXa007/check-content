@@ -1,6 +1,7 @@
 package com.example.checkContent.model;
 
 import com.example.checkContent.Enums.CategoryEnum;
+import com.example.checkContent.Enums.ContentStatus;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
@@ -13,7 +14,7 @@ public class Content extends Base implements Serializable {
     private String title;
     @Column(length = 1000)
     private String body;
-    private String status;
+    private ContentStatus status;
     private boolean published;
     @Enumerated(EnumType.STRING)
     private CategoryEnum categoryEnum;
@@ -30,7 +31,7 @@ public class Content extends Base implements Serializable {
     public Content(String title, String body) {
         this.title = title;
         this.body = body;
-        this.status = "WAITING";
+        this.status = ContentStatus.WAITING;
         this.published = false;
     }
 
@@ -60,11 +61,11 @@ public class Content extends Base implements Serializable {
         this.body = body;
     }
 
-    public String getStatus() {
+    public ContentStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(ContentStatus status) {
         this.status = status;
     }
 
