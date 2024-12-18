@@ -2,6 +2,7 @@ package com.example.checkContent.model;
 
 import com.example.checkContent.Enums.CategoryEnum;
 import com.example.checkContent.Enums.ContentStatus;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
@@ -21,7 +22,7 @@ public class Content extends Base implements Serializable {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
-    @JsonManagedReference
+    @JsonBackReference
     private User user;
 
     @OneToMany(mappedBy = "content", cascade = CascadeType.ALL)

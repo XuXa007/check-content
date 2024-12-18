@@ -2,7 +2,7 @@
 
 ###
 # @name get
-GET localhost:8081/content
+GET localhost:8081/content/3
 Content-Type: application/json
 
 #{
@@ -33,8 +33,8 @@ POST localhost:8081/content
 Content-Type: application/json
 
 {
-  "title": "заголовок быстрые деньги",
-  "body": "Текст быстрые деньги, который возможно надо поменять)))))",
+  "title": "Заголовок заголовка ",
+  "body": "Текст, спорт возможно надо поменять. Текст, который возможно надо поменять",
   "userId": "1"
 }
 
@@ -56,7 +56,7 @@ PATCH localhost:8081/content/update/1
 Content-Type: application/json
 
 {
-  "id": 4,
+  "id": 2,
   "title": "UPDATE заголовок контента",
   "body": "Текст контента, который возможно надо поменять)Текст контента, который возможно надо поменять)Текст контента, который возможно надо поменять)Текст контента, который ",
   "status": "REJECTED",
@@ -78,6 +78,10 @@ Content-Type: application/json
   "email": "email",
   "role": 0
 }
+
+###
+# @name user get
+GET localhost:8081/responses/2
 
 ###
 # @name user get

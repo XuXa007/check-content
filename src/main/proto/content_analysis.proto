@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package Content;
+
+option java_multiple_files = true;
+option java_package = "com.example.contentanalysis.grpc";
+option optimize_for = SPEED;
+
+enum Category {
+  NEWS = 0;
+  SPORT = 1;
+  POLITICS = 2;
+  ANOTHER = 3;
+  EDUCATION = 4;
+  TECH = 5;
+}
+
+service ClassificationContentService {
+  rpc DetectCategory (CategoryRequest) returns (CategoryResponse) {}
+}
+
+message CategoryRequest {
+  string title = 1;
+  string content = 2;
+  string requestId = 3;
+}
+
+message CategoryResponse {
+  string requestId = 1;
+  Category category = 2;
+}

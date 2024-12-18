@@ -2,6 +2,7 @@ package com.example.checkContent.model;
 
 import com.example.checkContent.Enums.RoleEnum;
 import com.example.checkContent.Enums.UserStatus;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -16,6 +17,7 @@ public class User extends Base {
     private RoleEnum role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonBackReference
     private List<Content> contents;
 
     @Enumerated(EnumType.STRING)

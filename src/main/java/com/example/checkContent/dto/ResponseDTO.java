@@ -5,6 +5,9 @@ public class ResponseDTO {
     private Long contentId;
     private Long userId;
 
+    public ResponseDTO() {
+    }
+
     public ResponseDTO(String message, Long contentId, Long userId) {
         this.message = message;
         this.contentId = contentId;

@@ -15,65 +15,28 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableRabbit
 public class RabbitMQConfiguration {
-    public static final String contentToModerationQueue = "contentToModerationQueue";
-    public static final String publishQueue = "contentPublishQueue";
-    public static final String exchangeName = "contentExchange";
+    public static final String CONTENT_MODERATION_QUEUE = "content.moderation.queue";
+    public static final String CONTENT_STATISTICS_QUEUE = "content.statistics.queue";
 
     @Bean
-    public Queue moderationQueue() {
-        return new Queue(contentToModerationQueue, true);
+    public Queue contentModerationQueue() {
+        return new Queue(CONTENT_MODERATION_QUEUE, true);
     }
 
     @Bean
-    public Queue publishQueue() {
-        return new Queue(publishQueue, true);
+    public Queue contentStatisticsQueue() {
+        return new Queue(CONTENT_STATISTICS_QUEUE, true);
     }
 
     @Bean
-    public Queue moderationResultQueue() {
-        return new Queue("moderation.results", true);
-    }
-
-    @Bean
-    public TopicExchange exchange() {
-        return new TopicExchange(exchangeName);
-    }
-
-    @Bean
-    public Binding resultBinding() {
-        return BindingBuilder
-                .bind(moderationResultQueue())
-                .to(exchange())
-                .with("moderation.result");
-    }
-
-    @Bean
-    public Binding moderationBinding(Queue moderationQueue, TopicExchange exchange) {
-        return BindingBuilder
-                .bind(moderationQueue)
-                .to(exchange)
-                .with("moder.key");
-    }
-
-    @Bean
-    public Binding publishBinding(Queue publishQueue, TopicExchange exchange) {
-        return BindingBuilder
-                .bind(publishQueue)
-                .to(exchange)
-                .with("publish.key");
-    }
-
-    @Bean
-    public MessageConverter jsonMessageConverter() {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
-        return new Jackson2JsonMessageConverter(mapper);
+    public MessageConverter messageConverter() {
+        return new Jackson2JsonMessageConverter();
     }
 
     @Bean
     public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
         RabbitTemplate template = new RabbitTemplate(connectionFactory);
-        template.setMessageConverter(jsonMessageConverter());
+        template.setMessageConverter(messageConverter());
         return template;
     }
 }

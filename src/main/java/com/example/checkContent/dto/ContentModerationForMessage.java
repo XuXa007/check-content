@@ -11,16 +11,23 @@ public class ContentModerationForMessage implements Serializable {
     private String title;
     private String body;
     private CategoryEnum categoryEnum;
-    private Long userId;
+//    private Long userId;
 //    private LocalDateTime createdAt;
 
 
-    public ContentModerationForMessage(Long id, String title, String body, CategoryEnum categoryEnum, Long userId) {
+    public ContentModerationForMessage(Long id, String title, String body, CategoryEnum categoryEnum) {
         this.id = id;
         this.title = title;
         this.body = body;
         this.categoryEnum = categoryEnum;
-        this.userId = userId;
+//        this.userId = userId;
+    }
+
+
+    public ContentModerationForMessage(Long id, String title, String body) {
+        this.id = id;
+        this.title = title;
+        this.body = body;
     }
 
     // Фабричный метод
@@ -29,8 +36,7 @@ public class ContentModerationForMessage implements Serializable {
                 content.getId(),
                 content.getTitle(),
                 content.getBody(),
-                content.getCategoryEnum(),
-                content.getUser() != null ? content.getUser().getId() : null
+                content.getCategoryEnum()
         );
     }
 
@@ -69,11 +75,4 @@ public class ContentModerationForMessage implements Serializable {
         this.categoryEnum = categoryEnum;
     }
 
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
 }

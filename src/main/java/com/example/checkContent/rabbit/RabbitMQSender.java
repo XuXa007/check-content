@@ -16,13 +16,13 @@ public class RabbitMQSender {
     }
 
     public void sendToModeration(ContentModerationForMessage message) {
-        System.out.println("Отправка контента на модерацию с ID: " + message.getId());
-        rabbitTemplate.convertAndSend(RabbitMQConfiguration.exchangeName, "moder.key", message);
+        System.out.println("(RabbitMQSender) Отправка контента на модерацию с ID: " + message.getId());
+        rabbitTemplate.convertAndSend(message);
     }
 
     public void publishedContent(Content content) {
         System.out.println("Публикация контента: " + content.getId());
-        rabbitTemplate.convertAndSend(RabbitMQConfiguration.exchangeName, "publish.key", content);
+        rabbitTemplate.convertAndSend(content);
     }
 
 }

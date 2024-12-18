@@ -25,9 +25,6 @@ public class ContentController {
         this.assembler = assembler;
     }
 
-
-
-
     @PostMapping
     public EntityModel<ContentDTO> addContent(@RequestBody ContentDTO contentDTO) {
         ContentDTO content = contentService.addContent(contentDTO);
@@ -52,15 +49,6 @@ public class ContentController {
 
     @PatchMapping("/approve/{id}")
     public ResponseEntity<EntityModel<ContentDTO>> approveContent(@PathVariable Long id) {
-//        contentService.approveContent(id);
-//
-//        ContentDTO content = contentService.getContentById(id);
-//        if (content.getStatus().equals("APPROVED")) {
-//            return ResponseEntity.ok("yes");
-//        } else if (content.getStatus().equals("REJECTED")) {
-//            return ResponseEntity.ok("no");
-//        }
-//        return ResponseEntity.notFound().build();
         ContentDTO content = contentService.approveContent(id);
         return ResponseEntity.ok(assembler.toModel(content));
     }

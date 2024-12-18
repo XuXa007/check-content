@@ -51,7 +51,7 @@ public class ResponseController {
 //    }
 
     @GetMapping("/{id}")
-    public ResponseEntity<EntityModel<ResponseDTO>> getResponseById(@PathVariable Long id) {
+    public EntityModel<ResponseDTO> getResponseById(@PathVariable Long id) {
         Response response = responseService.getResponseById(id).orElseThrow(RuntimeException::new);
         ResponseDTO responseDTO = modelMapper.map(response, ResponseDTO.class);
 
@@ -61,6 +61,6 @@ public class ResponseController {
         responseDTOEntityModel.add(linkTo(methodOn(ContentController.class).getContentById(response.getContent().getId())).withRel("content"));
 
 
-        return ResponseEntity.ok(responseDTOEntityModel);
+        return responseDTOEntityModel;
     }
 }
