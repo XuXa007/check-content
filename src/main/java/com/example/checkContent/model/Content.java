@@ -25,9 +25,11 @@ public class Content extends Base implements Serializable {
     @JsonBackReference
     private User user;
 
-    @OneToMany(mappedBy = "content", cascade = CascadeType.ALL)
-    @JsonManagedReference
-    private List<Response> responses;
+//    @OneToMany(mappedBy = "content", cascade = CascadeType.ALL)
+//    @JsonManagedReference
+//    private List<Response> responses;
+
+    private String responses;
 
     public Content(String title, String body) {
         this.title = title;
@@ -86,11 +88,11 @@ public class Content extends Base implements Serializable {
         this.user = user;
     }
 
-    public List<Response> getResponses() {
+    public String getResponses() {
         return responses;
     }
 
-    public void setResponses(List<Response> responses) {
+    public void setResponses(String responses) {
         this.responses = responses;
     }
 

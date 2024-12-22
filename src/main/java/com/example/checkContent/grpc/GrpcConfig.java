@@ -1,7 +1,5 @@
 package com.example.checkContent.grpc;
 
-import com.example.contentanalysis.grpc.CategoryRequest;
-import com.example.contentanalysis.grpc.CategoryResponse;
 import com.example.contentanalysis.grpc.ClassificationContentServiceGrpc;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -34,14 +32,14 @@ public class GrpcConfig implements AutoCloseable{
     }
 
 
-    public CategoryResponse classifyContent(String title, String content, String requestId) {
-        CategoryRequest request = CategoryRequest.newBuilder()
-                .setTitle(title)
-                .setContent(content)
-                .setRequestId(requestId)
-                .build();
-
-        return blockingStub.detectCategory(request);
-    }
+//    public CategoryResponse classifyContent(String title, String content, String requestId) {
+//        CategoryRequest request = CategoryRequest.newBuilder()
+//                .setTitle(title)
+//                .setContent(content)
+//                .setRequestId(requestId)
+//                .build();
+//
+//        return blockingStub.detectCategory(request);
+//    }
 }
 

@@ -5,12 +5,12 @@ import java.io.Serializable;
 public class ModerationResult implements Serializable {
     private Long contentId;
     private String status;
-    private String mes;
+    private String message;
 
-    public ModerationResult(Long contentId, String status, String mes) {
+    public ModerationResult(Long contentId, String status, String message) {
         this.contentId = contentId;
         this.status = status;
-        this.mes = mes;
+        this.message = message;
     }
 
     public ModerationResult() {
@@ -32,11 +32,11 @@ public class ModerationResult implements Serializable {
         this.status = status;
     }
 
-    public String getMes() {
-        return mes;
+    public String getMessage() {
+        return message;
     }
 
-    public void setMes(String mes) {
-        this.mes = mes;
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

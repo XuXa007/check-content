@@ -1,6 +1,6 @@
 package com.example.checkContent.rabbit;
 
-import com.example.checkContent.dto.ContentModerationForMessage;
+import com.example.checkContent.dto.ContentContentToCheck;
 import com.example.checkContent.model.Content;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,7 @@ public class RabbitMQSender {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    public void sendToModeration(ContentModerationForMessage message) {
+    public void sendToModeration(ContentContentToCheck message) {
         System.out.println("(RabbitMQSender) Отправка контента на модерацию с ID: " + message.getId());
         rabbitTemplate.convertAndSend(message);
     }

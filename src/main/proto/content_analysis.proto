@@ -15,17 +15,28 @@ enum Category {
   TECH = 5;
 }
 
+enum ContentStatus {
+  WAITING = 0;
+  APPROVED = 1;
+  REJECTED = 2;
+  PUBLISHED = 3;
+}
+
+message ContentRequest {
+  int64 id = 1;
+  string title = 2;
+  string body = 3;
+  ContentStatus status = 4;
+  string message = 5;
+}
+
+message ContentResponse {
+  int64 id = 1;
+  ContentStatus status = 2;
+  string message = 3;
+  Category category = 4;
+}
+
 service ClassificationContentService {
-  rpc DetectCategory (CategoryRequest) returns (CategoryResponse) {}
-}
-
-message CategoryRequest {
-  string title = 1;
-  string content = 2;
-  string requestId = 3;
-}
-
-message CategoryResponse {
-  string requestId = 1;
-  Category category = 2;
+  rpc ProcessContent (ContentRequest) returns (ContentResponse) {}
 }
